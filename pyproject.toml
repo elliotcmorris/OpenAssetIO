@@ -1,11 +1,13 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2021-2022 The Foundry Visionmongers Ltd
+
 [build-system]
 requires = [
-    "setuptools",
-    "cmake==3.21",
-    "ninja; platform_system!='Windows'"
+    "setuptools==65.5.0",
+    "cmake==3.24.1.1",
+    "ninja==1.10.2.4"
 ]
 build-backend = "setuptools.build_meta"
-
 
 [tool.pylint.messages_control]
 disable = [
