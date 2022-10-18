@@ -51,6 +51,7 @@ class build_ext(setuptools.command.build_ext.build_ext):
                 self.build_temp,
                 "-G",
                 "Ninja",
+                "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
                 # Place output artifacts where setuptools expects.
                 "--install-prefix",
                 os.path.abspath(self.build_lib),

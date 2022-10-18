@@ -58,17 +58,16 @@ line-length = 99
 target-version = ["py39"]
 
 [tool.cibuildwheel]
-build = ["cp39*x86_64"] 
-skip = ["*musllinux*"]
-environment = { CMAKE_TOOLCHAIN_FILE='.conan/conan_paths.cmake'}
 test-requires = ["pytest", "mock"]
 test-command = "pytest {package}/tests/python/openassetio"
 
 [tool.cibuildwheel.linux]
+# Linux runs in a docker container, with the project at top level
+build = ["cp39-manylinux_x86_64"] 
 before-build = "resources/build/bootstrap-centos-7.sh"
 
 [tool.cibuildwheel.windows]
-before-build = "resources/build/bootstrap-windows-2019.sh"
+build = ["cp39-win_amd64"] 
 
 [tool.cibuildwheel.macos]
-before-build = "resources/build/bootstrap-macos-10.15.sh"
+build = ["*"]
