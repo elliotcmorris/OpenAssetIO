@@ -59,8 +59,13 @@
       }
     },
     {
+<<<<<<< HEAD
       "name": "pip",
       "displayName": "Python setup.py",
+=======
+      "name": "setuptools",
+      "displayName": "Python setuptools setup.py",
+>>>>>>> Feltech/work/630-setuppy
       "description": "Settings for building Python extension module consumed by setuptools",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
