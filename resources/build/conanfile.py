@@ -13,15 +13,16 @@ class OpenAssetIOConan(ConanFile):
         "cmake_find_package",
     )
     settings = "os"
-    options = {"testing": [True, False]}
+    options = {"testing": [True, False], "install_cpython" : [True, False]}
     # TODO(DF): For minimal friction, default install unit test
     #  libraries for now - we should switch this off by default when
     #  we get to distributing a conan package.
-    default_options = {"testing": True}
+    default_options = {"testing": True, "install_cpython" : True}
 
     def build_requirements(self):
         # CY2022
-        self.tool_requires("cpython/3.9.7")
+        if self.options.install_cpython :
+            self.tool_requires("cpython/3.9.7")
         # Same as ASWF CY2022 Docker image:
         # https://github.com/AcademySoftwareFoundation/aswf-docker/blob/master/ci-base/README.md
         self.tool_requires("pybind11/2.8.1")

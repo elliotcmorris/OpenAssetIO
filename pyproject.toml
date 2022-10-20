@@ -61,13 +61,12 @@ target-version = ["py39"]
 test-requires = ["pytest", "mock"]
 test-command = "pytest {package}/tests/python/openassetio"
 
+
 [tool.cibuildwheel.linux]
 # Linux runs in a docker container, with the project at top level
 build = ["cp39-manylinux_x86_64"] 
-before-build = "resources/build/bootstrap-centos-7.sh"
+before-build = "resources/build/bootstrap-cibuildwheel-manylinux-2014.sh"
+environment = { CMAKE_TOOLCHAIN_FILE=".conan/conan_paths.cmake" }
 
 [tool.cibuildwheel.windows]
 build = ["cp39-win_amd64"] 
-
-[tool.cibuildwheel.macos]
-build = ["*"]

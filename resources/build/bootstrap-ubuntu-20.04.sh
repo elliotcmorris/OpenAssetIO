@@ -39,9 +39,11 @@ conan profile update settings.compiler.libcxx=libstdc++ default
 # system packages are already available. In particular, this affects
 # recent versions of the xorg/system recipe (a dependency of cpython).
 # The problem is reported and fixed in https://github.com/conan-io/conan/pull/11712
-conan install --install-folder "$CONAN_USER_HOME" --build=missing \
+conan install --install-folder "$WORKSPACE/.conan" --build=missing \
     -c tools.system.package_manager:mode=install \
     -c tools.system.package_manager:sudo=True \
+    -o testing=False \
+    -o install_cpython=False \
     "$WORKSPACE/resources/build"
 # Ensure we have the expected version of clang-* available
 sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-12 10

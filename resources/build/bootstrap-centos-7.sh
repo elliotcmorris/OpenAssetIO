@@ -29,7 +29,11 @@ yum install -y xorg-x11-xtrans-devel xkeyboard-config-devel
 pip3 install -r "resources/build/requirements.txt"
 # Use explicit predictable conan root path, to be used for both packages
 # and conan CMake toolchain config.
-export CONAN_USER_HOME="$WORKSPACE/.conan"
+#export CONAN_USER_HOME="$WORKSPACE/.conan"
+export CONAN_USER_HOME="$HOME/conan"
+
+
+
 # Create default conan profile so we can configure it before instlibXcomposite-develall.
 # Use --force so that if it already exists we don't error out.
 conan profile new default --detect --force
@@ -44,10 +48,14 @@ conan profile update settings.compiler.libcxx=libstdc++ default
 # system packages are already available. In particular, this affects
 # recent versions of the xorg/system recipe (a dependency of cpython).
 # The problem is reported and fixed in https://github.com/conan-io/conan/pull/11712
-echo $CONAN_USER_HOME
-conan install --install-folder "$CONAN_USER_HOME" --build=missing \
+#conan install --install-folder "$CONAN_USER_HOME" --build=missing \
+conan install --install-folder ".conan" --build=missing \
     -c tools.system.package_manager:mode=install \
+    -o testing=False \
+    -o install_cpython=False \
     "resources/build"
+
+
 # Ensure we have the expected version of clang-* available
 #update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-12 10
 #update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-12 10

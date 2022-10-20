@@ -9,11 +9,15 @@ if (OPENASSETIO_ENABLE_PYTHON)
     list(APPEND python_components Development.Module)
     list(APPEND python_components Interpreter)
 
+    set(CMAKE_FIND_DEBUG_MODE TRUE)
+
     # Locate the Python package.
     find_package(
         Python ${OPENASSETIO_PYTHON_VERSION}
         REQUIRED
         COMPONENTS ${python_components})
+
+    set(CMAKE_FIND_DEBUG_MODE FALSE)
 
     # Debug log some outputs expected from the built-in FindPython.
     message(TRACE "Python_EXECUTABLE = ${Python_EXECUTABLE}")
