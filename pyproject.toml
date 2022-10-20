@@ -1,3 +1,14 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2021-2022 The Foundry Visionmongers Ltd
+
+[build-system]
+requires = [
+    "setuptools==65.5.0",
+    "cmake==3.24.1.1",
+    "ninja==1.10.2.4"
+]
+build-backend = "setuptools.build_meta"
+
 [tool.pylint.messages_control]
 disable = [
     "too-many-arguments",
@@ -45,3 +56,13 @@ ignore-imports = true
 [tool.black]
 line-length = 99
 target-version = ["py39"]
+
+[tool.cibuildwheel]
+# TODO remove mock
+test-requires = ["pytest", "mock"]
+test-command = "pytest {package}/tests/python/openassetio"
+
+[tool.cibuildwheel.linux]
+# Linux runs in a docker container, with the project at top level
+before-build = "resources/build/bootstrap-cibuildwheel-manylinux-2014.sh"
+environment = { CMAKE_TOOLCHAIN_FILE=".conan/conan_paths.cmake" }
