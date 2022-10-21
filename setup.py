@@ -17,6 +17,7 @@ import inspect
 import os
 import subprocess
 import shlex
+import sys
 
 from setuptools import (
     setup,
@@ -51,6 +52,9 @@ class build_ext(setuptools.command.build_ext.build_ext):
                 os.path.abspath(self.build_lib),
                 "--preset",
                 "setuptools",
+                # Tell Cmake which python exectuable to use, as it's neccesary to use the same
+                # python installation that setup.py was invoked with.
+                "-DPython_EXECUTABLE=" + sys.executable,
             ]
         )
 

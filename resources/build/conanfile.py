@@ -7,26 +7,26 @@ class OpenAssetIOConan(ConanFile):
         # which augments package search paths with conan package
         # directories.
         "cmake_paths",
-        # Generate `Find<PackageName>.cmake` finders, required for
-        # various public ConanCenter packages (e.g. pybind11) since they
-        # disallow bundling of `<PackageName>Config.cmake`-like files in
-        # the package.
+        # Generate `Find<PackageName>.cmake` finders, required for various
+        # public ConanCenter packages (e.g. pybind11) since they disallow
+        # bundling of `<PackageName>Config.cmake`-like files in the package.
         "cmake_find_package",
     )
     settings = "os"
-    options = {"require_test_deps": [True, False]}
-    # TODO(DF): For minimal friction, default enable install of unit
-    #  test libraries for now - we should switch this off by default
-    #  when we get to distributing a conan package.
-    default_options = {"require_test_deps": True}
+    options = {"testing": [True, False], "install_cpython" : [True, False]}
+    # TODO(DF): For minimal friction, default install unit test
+    #  libraries for now - we should switch this off by default when
+    #  we get to distributing a conan package.
+    default_options = {"testing": True, "install_cpython" : True}
 
     def build_requirements(self):
         # CY2022
-        self.tool_requires("cpython/3.9.7")
+        if self.options.install_cpython :
+            self.tool_requires("cpython/3.9.7")
         # Same as ASWF CY2022 Docker image:
         # https://github.com/AcademySoftwareFoundation/aswf-docker/blob/master/ci-base/README.md
         self.tool_requires("pybind11/2.8.1")
-        if self.options.require_test_deps:
+        if self.options.testing:
             # Test framework
             self.tool_requires("catch2/2.13.8")
             # Mocking library
