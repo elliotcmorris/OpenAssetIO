@@ -36,8 +36,8 @@ jobs:
       if: runner.os != 'Windows'
       run: >
         cmake -S . -B build -G Ninja
-        --install-prefix $GITHUB_WORKSPACE/dist
-        --toolchain $HOME/conan/conan_paths.cmake
+        --install-prefix ${{ github.workspace }}/dist
+        --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
         --preset test
 
     - name: Configure CMake build (Windows)
@@ -45,8 +45,8 @@ jobs:
       run: >
         call "${{ matrix.config.vcvars }}"
 
-        cmake -G Ninja -S . -B build --install-prefix %GITHUB_WORKSPACE%\dist
-        --toolchain %USERPROFILE%\conan\conan_paths.cmake -DCMAKE_VERBOSE_MAKEFILE=ON
+        cmake -G Ninja -S . -B build --install-prefix ${{ github.workspace }}\dist
+        --toolchain ${{ github.workspace }}\.conan\conan_paths.cmake -DCMAKE_VERBOSE_MAKEFILE=ON
         --preset test
 
       shell: cmd
