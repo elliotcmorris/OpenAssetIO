@@ -20,8 +20,10 @@ jobs:
         # environments.
         config:
         - os: windows-2019
-          vcvars: "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvars64.bat"
+          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+          shell: cmd
         - os: ubuntu-20.04
+          shell: bash
         # Temporarily disabling macOS CI due to pybind issue, see:
         #   https://github.com/conan-io/conan-center-index/pull/11075
         # - os: macos-10.15
@@ -32,36 +34,20 @@ jobs:
     - name: Bootstrap
       uses: ./.github/bootstrap_platform
 
-    - name: Configure CMake build (Unix)
-      if: runner.os != 'Windows'
-      run: >
+    - name: Configure CMake build
+      run: |
+        ${{ matrix.config.preamble }}
+
         cmake -S . -B build -G Ninja
         --install-prefix ${{ github.workspace }}/dist
         --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
         --preset test
 
-    - name: Configure CMake build (Windows)
-      if: runner.os == 'Windows'
-      run: >
-        call "${{ matrix.config.vcvars }}"
 
-        cmake -G Ninja -S . -B build --install-prefix ${{ github.workspace }}/dist
-        --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake -DCMAKE_VERBOSE_MAKEFILE=ON
-        --preset test
-
-      shell: cmd
-
-    - name: Build, install and test (Unix)
-      if: runner.os != 'Windows'
+    - name: Build, install and test
       run: |
+        ${{ matrix.config.preamble }}
         ctest -VV --test-dir build --parallel 2
-
-    - name: Build, install and test (Windows)
-      if: runner.os == 'Windows'
-      run: |
-        call "${{ matrix.config.vcvars }}"
-        ctest -VV --test-dir build --parallel 2
-      shell: cmd
 
   docs:
     runs-on: ubuntu-latest
