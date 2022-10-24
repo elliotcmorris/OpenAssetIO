@@ -1,4 +1,4 @@
-from conans import ConanFile, CMake
+from conans import ConanFile, CMake, tools
 
 
 class OpenAssetIOConan(ConanFile):
@@ -16,7 +16,7 @@ class OpenAssetIOConan(ConanFile):
 
     def build_requirements(self):
         # CY2022
-        if self.options.install_cpython :
+        if not tools.get_env("OPENASSETIO_CONAN_SKIP_CPYTHON", False):
             self.tool_requires("cpython/3.9.7")
         # Same as ASWF CY2022 Docker image:
         # https://github.com/AcademySoftwareFoundation/aswf-docker/blob/master/ci-base/README.md

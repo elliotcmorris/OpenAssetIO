@@ -16,17 +16,12 @@ conan profile new default --detect --force
 # that already has python, don't install over them as they'll conflict.
 # We also don't need to install the test dependencies in that case, as
 # they're unused in the release workflow.
-INSTALL_PYTHON=True
-REQUIRE_TEST_DEPS=True
 if [ "$CIBUILDWHEEL" = "1" ]
 then
-  INSTALL_PYTHON=False
-  REQUIRE_TEST_DEPS=False
+  export OPENASSETIO_CONAN_SKIP_CPYTHON="True"
 fi
 
 # Install openassetio third-party dependencies from public Conan Center
 # package repo.
-conan install --install-folder "$WORKSPACE/.conan" --build=missing \
-    -o testing=$REQUIRE_TEST_DEPS \
-    -o install_cpython=$INSTALL_PYTHON \
+conan install --install-folder "$WORKSPACE/.conan" --build=missing
     "$WORKSPACE/resources/build"
