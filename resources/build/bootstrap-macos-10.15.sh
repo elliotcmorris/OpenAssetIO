@@ -23,5 +23,5 @@ fi
 
 # Install openassetio third-party dependencies from public Conan Center
 # package repo.
-conan install --install-folder "$WORKSPACE/.conan" --build=missing
+conan install --install-folder "$WORKSPACE/.conan" --build=missing \
     "$WORKSPACE/resources/build"
