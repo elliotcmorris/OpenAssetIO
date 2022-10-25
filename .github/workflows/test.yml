@@ -34,6 +34,7 @@ jobs:
     - name: Configure CMake build
       run: >
         ${{ matrix.config.preamble }}
+
         cmake -S . -B build -G Ninja
         --install-prefix ${{ github.workspace }}/dist
         --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
@@ -42,6 +43,7 @@ jobs:
     - name: Build, install and test
       run: >
         ${{ matrix.config.preamble }}
+        
         ctest -VV --test-dir build --parallel 2
 
   docs:
