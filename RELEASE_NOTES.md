@@ -67,6 +67,10 @@ v1.0.0-alpha.x
   want python installations to conflict.
   [#653](https://github.com/OpenAssetIO/OpenAssetIO/issues/653)]
 
+- Bleeding edge python wheels are now downloadable as artifacts from the
+  `Build wheels` github actions workflow.
+  [[#653](https://github.com/OpenAssetIO/OpenAssetIO/issues/653)]
+
 v1.0.0-alpha.4
 --------------
 
