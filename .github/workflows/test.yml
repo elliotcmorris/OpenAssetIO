@@ -46,6 +46,11 @@ jobs:
         --toolchain %USERPROFILE%\conan\conan_paths.cmake -DCMAKE_VERBOSE_MAKEFILE=ON
         --preset test
 
+        echo %errorlevel%
+        if errorlevel 1 (
+          echo Failure Reason Given is %errorlevel%
+        )
+
       shell: cmd
 
     - name: Build, install and test (Unix)
