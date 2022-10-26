@@ -47,10 +47,9 @@ jobs:
           OPENASSETIO_CONAN_SKIP_CPYTHON: "True"
 
       - name: Build wheels
-        run: |
-          ${{ matrix.config.preamble }}
-          pip install cibuildwheel
-          cibuildwheel --output-dir wheelhouse
+        uses: pypa/cibuildwheel@v2.11.1
+        with:
+          output-dir: wheelhouse
         env: 
           # Windows + Mac runs use this environment variable, as they
           # execute directly on the runner. Linux runs are somewhat
