@@ -117,7 +117,7 @@ line-length = 99
 target-version = ["py39"]
 
 [tool.cibuildwheel]
-test-requires = ["pytest", "mock"]
+test-requires = ["pytest"]
 test-command = "pytest {package}/tests/python/openassetio"
 
 [tool.cibuildwheel.linux]
