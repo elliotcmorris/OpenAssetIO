@@ -124,3 +124,4 @@ test-command = "pytest {package}/tests/python/openassetio"
 # Linux runs in a docker container, with the project at top level
 before-build = "resources/build/bootstrap-cibuildwheel-manylinux-2014.sh"
 environment = { CMAKE_TOOLCHAIN_FILE=".conan/conan_paths.cmake" }
+environment-pass = ["PIP_VERBOSE"]
