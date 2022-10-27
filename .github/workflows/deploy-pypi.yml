@@ -1,0 +1,124 @@
+# - Build Python Wheels
+# - Deploy to TestPyPI
+# - Download from TestPyPI
+# - Run tests on downloaded artifacts
+# - Deploy to real PyPI
+name: Deploy_PyPI
+
+on: 
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  call_build_wheels:
+    name: Call 🗣️🔨 Build Wheels
+    uses: ./.github/workflows/build-wheels.yml
+
+  publish_testpypi:
+    name: Publish distribution 📦 to TestPyPI
+    needs: call_build_wheels
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch'}}
+    steps:
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: "openassetio-wheels"
+          path: dist
+
+      - name: Upload to TestPyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.TEST_PYPI_ACCESS_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/
+
+  verify_test_pypi:
+    name: Verify TestPyPI 🧪 distribution
+    needs: publish_testpypi
+    runs-on: ${{ matrix.config.os }}
+    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch'}}
+    strategy:
+      fail-fast: false
+      matrix:
+        config: 
+          - os: ubuntu-20.04
+            venv_activate: source .venv/bin/activate
+            shell: bash
+          - os: macos-10.15
+            venv_activate: source .venv/bin/activate
+            shell: bash
+          - os: windows-2019
+            venv_activate: .venv\\Scripts\\activate
+            shell: cmd
+        # These should be kept in sync with the platfoms we're building
+        # for in build-wheels.yml
+        python-version: ['3.9', '3.10']
+    defaults:
+      run:
+        # Annoyingly required here since `matrix` isn't available in the
+        # `shell` property of individual steps.
+        shell: ${{ matrix.config.shell }}
+        
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      # Extracts the version from the pyproject.toml file, so we can
+      # make sure that we've succesfully deployed the explicit version
+      # we intended.
+      - name: Parse deployed version
+        uses: SebRollen/toml-action@v1.0.1
+        id: deployed_version
+        with:
+          file: '${{ github.workspace }}/pyproject.toml'
+          field: 'project.version'
+
+      - name: Setup Venv
+        run : |
+          python -m venv .venv
+
+      # Sometimes, PiPY won't publish platform end points quick enough,
+      # so we get to the point when we're trying to install them 
+      # immediately after upload, and they don't exist yet. For that
+      # reason we retry to get them a few times before concluding there
+      # is any problem.
+      - name: Install OpenAssetIO
+        uses: nick-fields/retry@v2
+        with: 
+          max_attempts: 3
+          retry_wait_seconds: 15
+          timeout_minutes: 1
+          shell: ${{ matrix.config.shell }}
+          command : |
+            ${{ matrix.config.venv_activate }}
+            pip install -i https://test.pypi.org/simple/ openassetio==${{ steps.deployed_version.outputs.value }}
+
+      - name: Run Pytest
+        run : |
+          ${{ matrix.config.venv_activate }}
+          pip install -r ${{ github.workspace }}/tests/python/requirements.txt
+          pytest ${{ github.workspace }}/tests/python/openassetio
+
+  publish_pypi:
+    name: Publish distribution 📦 to PyPI
+    needs: verify_test_pypi
+    runs-on: ubuntu-20.04
+    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch'}}
+    steps:
+      - name: Download wheel artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: "openassetio-wheels"
+          path: dist
+
+      - name: Upload to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          user: __token__
+          password: ${{ secrets.PYPI_ACCESS_TOKEN }}
