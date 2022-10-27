@@ -1,9 +1,8 @@
+# This workflow is used as a called-workflow from deploy-pypi.yml
 name: Build Wheels
 
 on: 
-  push:
-    branches:
-      - main
+  workflow_call:
   workflow_dispatch:
   pull_request:
     branches-ignore:
@@ -13,7 +12,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.config.os }} - ${{matrix.python-build}}
+    name: Build wheels 🔨 on ${{ matrix.config.os }} - ${{matrix.python-build}}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -21,8 +20,8 @@ jobs:
         config: 
           - os: ubuntu-20.04
             shell: bash
-          # - os: macos-10.15
-          #   shell: bash
+          - os: macos-10.15
+            shell: bash
           - os: windows-2019
             preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
             shell: cmd
@@ -41,16 +40,12 @@ jobs:
 
       - name: Bootstrap
         uses: ./.github/bootstrap_platform
-        env:
-          # As we're building wheels inside a managed environment,
-          # (cibuildwheels) there is no need to install cpython. 
-          OPENASSETIO_CONAN_SKIP_CPYTHON: "True"
 
       - name: Build wheels
         run: |
           ${{ matrix.config.preamble }}
-          pip install cibuildwheel==2.11.1
-          cibuildwheel --output-dir wheelhouse
+          pip install cibuildwheel
+          cibuildwheel --output-dir dist
         env: 
           # Windows + Mac runs use this environment variable, as they
           # execute directly on the runner. Linux runs are somewhat
@@ -73,4 +68,5 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: "openassetio-wheels"
-          path: ./wheelhouse/*.whl
+          path: ./dist/*.whl
+
