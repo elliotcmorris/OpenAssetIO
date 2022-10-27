@@ -12,7 +12,7 @@ on:
 
 jobs:
   call_build_wheels:
-  uses: ./.github/workflows/build-wheels.yml
+    uses: ./.github/workflows/build-wheels.yml
 
   publish_testpypi:
     name: Publish distribution 📦 to TestPyPI
