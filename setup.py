@@ -55,6 +55,7 @@ class build_ext(setuptools.command.build_ext.build_ext):
                 # Ensure expected Python environment is discovered by
                 # CMake's `find_package` during the build.
                 f"-DPython_EXECUTABLE={sys.executable}",
+                "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
             ]
         )
 
