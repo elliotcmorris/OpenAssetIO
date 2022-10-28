@@ -55,6 +55,10 @@ class build_ext(setuptools.command.build_ext.build_ext):
                 # Ensure expected Python environment is discovered by
                 # CMake's `find_package` during the build.
                 f"-DPython_EXECUTABLE={sys.executable}",
+                # On MacOS, C++ stdlib support is bundled as part of
+                # the system. Targetting 10.15 is neccesary to enable
+                # usage of certain C++17 features, particularly
+                # std::filesystem.
                 "-DCMAKE_OSX_DEPLOYMENT_TARGET=10.15",
             ]
         )
