@@ -30,7 +30,7 @@ jobs:
 
   publish_pypi:
     name: Publish distribution 📦 to PyPI
-    needs: verify_test_pypi
+    needs: publish_testpypi
     runs-on: ubuntu-20.04
     steps:
       - name: Download wheel artifacts
