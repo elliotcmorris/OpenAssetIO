@@ -19,7 +19,6 @@ jobs:
     name: Publish distribution 📦 to TestPyPI
     needs: call_build_wheels
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch'}}
     steps:
       - name: Download wheel artifacts
         uses: actions/download-artifact@v3
@@ -38,7 +37,6 @@ jobs:
     name: Publish distribution 📦 to PyPI
     needs: verify_test_pypi
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name == 'release' || github.event_name == 'workflow_dispatch'}}
     steps:
       - name: Download wheel artifacts
         uses: actions/download-artifact@v3
