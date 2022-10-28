@@ -13,7 +13,7 @@ on:
 
 jobs:
   build_wheels:
-    name: Build wheels on ${{ matrix.config.os }} - ${{matrix.python-build}}
+    name: Build wheels 🔨 on ${{ matrix.config.os }} - ${{matrix.python-build}}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -74,3 +74,4 @@ jobs:
         with:
           name: "openassetio-wheels"
           path: ./wheelhouse/*.whl
+
