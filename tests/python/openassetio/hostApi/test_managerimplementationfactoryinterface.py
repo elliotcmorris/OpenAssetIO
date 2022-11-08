@@ -37,7 +37,9 @@ class Test_ManagerImplementationFactoryInterface:
             # pylint: disable=protected-access
             a_manager_interface_factory_interface._logger = "something"
 
-        assert str(err.value) == "can't set attribute"
+        assert (str(err.value) == "property of 'ManagerImplementationFactoryInterface'"
+               " object has no setter"
+        )
 
 
 class Test_ManagerImplementationFactoryInterface_identifiers:
