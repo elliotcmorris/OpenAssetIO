@@ -32,7 +32,7 @@ jobs:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/.conan/conan_paths.cmake
 
       - name: Lint
-        uses: TheFoundryVisionmongers/fn-pylint-action@v1.1
+        uses: TheFoundryVisionmongers/fn-pylint-action@v1.1.3-beta.1
         with:
           pylint-disable: fixme  # We track 'todo's through other means
           pylint-rcfile: "./pyproject.toml"
