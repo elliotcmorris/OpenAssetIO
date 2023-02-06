@@ -43,6 +43,8 @@ target_link_libraries(
 # Create CTest target
 
 # Requires: openassetio.internal.install
+# (Disable line too long as it makes this command awkward.)
+# cmake-lint: disable=C0301
 add_custom_target(
     openassetio.internal.core-cpp-test
     COMMAND

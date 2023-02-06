@@ -96,7 +96,8 @@ separate_arguments(_envvars NATIVE_COMMAND ${_envvars})
 
 #-----------------------------------------------------------------------
 # Create CTest target.
-
+# (Disable line too long as it makes this command awkward.)
+# cmake-lint: disable=C0301
 add_custom_target(
     openassetio.internal.python-bridge-test
     COMMAND
