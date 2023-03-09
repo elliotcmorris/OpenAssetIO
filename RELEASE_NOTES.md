@@ -14,9 +14,16 @@ v1.0.0-alpha.X
 
 - Added `TraitBase.isImbuedTo` static/class method, giving a cheaper
   mechanism for testing whether a `TraitsData` is imbued with a trait.
-  [#815](https://github.com/OpenAssetIO/OpenAssetIO/issues/815)
+  [#815](https://github.com/OpenAssetIO/OpenAssetIO/issues/815)z
 
+### Bug fixes
 
+- Removed `nodiscard` from `TraitsData::getTraitProperty`, and
+  `TraitBase::getTraitProperty`, to allow "value or default" style use
+  cases.
+  [#825](https://github.com/OpenAssetIO/OpenAssetIO/issues/825)
+
+  
 v1.0.0-alpha.9
 --------------
 
