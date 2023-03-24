@@ -436,10 +436,6 @@ class OPENASSETIO_CORE_EXPORT Manager {
    * populated with the available data for the requested set of
    * traits for each given @ref entity_reference.
    *
-   * This call will block until all resolutions are complete and
-   * callbacks have been called. Callbacks will be called on the
-   * same thread that called `resolve`
-   *
    * Any traits that aren't applicable to any particular entity
    * reference will not be set in the returned data. Consequently, a
    * trait being set in the result is confirmation that an entity has
@@ -474,6 +470,10 @@ class OPENASSETIO_CORE_EXPORT Manager {
    * exception whereas a client error (4xx) would correspond to a
    * `BatchElementError`.
    *
+   * This call will block until all resolutions are complete and
+   * callbacks have been called. Callbacks will be called on the
+   * same thread that called `resolve`
+   *
    * @param entityReferences Entity references to query.
    *
    * @param context The calling context.
@@ -496,28 +496,153 @@ class OPENASSETIO_CORE_EXPORT Manager {
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `resolve`.
    */
-  // Multi callback
   void resolve(const EntityReferences& entityReferences, const trait::TraitSet& traitSet,
                const ContextConstPtr& context, const ResolveSuccessCallback& successCallback,
                const BatchElementErrorCallback& errorCallback);
 
-  // Singular, throws BatchElementErrors
+  /**
+   * Provides a @fqref{TraitsData} "TraitsData" populated with the
+   * available data for the requested set of traits for the given @ref
+   * entity_reference.
+   *
+   * @see @ref resolve(const EntityReferences&, <!--
+   * --> const trait::TraitSet&, const ContextConstPtr&, <!--
+   * --> const ResolveSuccessCallback&, <!--
+   * --> const BatchElementErrorCallback& errorCallback)
+   * "Callback signature" variation for more details.
+   *
+   * Errors that occur during resolution will be thrown as an exception,
+   * either from the @ref manager plugin (for errors not specific to the
+   * entity reference) or as a @fqref{BatchElementException}
+   * "BatchElementException"-derived error.
+   *
+   * @param entityReference Entity reference to query.
+   *
+   * @param traitSet The trait IDs to resolve for the supplied list of
+   * entity references. Only traits applicable to the supplied entity
+   * references will be set in the resulting data.
+   *
+   * @param context The calling context.
+   *
+   * @param errorPolicyTag  Parameter for selecting the appropriate
+   * overload (tagged dispatch idiom).
+   *
+   * @return Populated data.
+   */
   TraitsDataPtr resolve(const EntityReference& entityReference, const trait::TraitSet& traitSet,
                         const ContextConstPtr& context,
                         BatchElementErrorPolicyTag::Except errorPolicyTag = {});
 
-  // Singular, returns BatchElementError object
+  /**
+   * Provides either a populated @fqref{TraitsData} "TraitsData" or a
+   * @fqref{BatchElementError} "BatchElementError".
+   *
+   * If successful, the result is populated with the
+   * available data for the requested set of traits for the given @ref
+   * entity_reference.
+   *
+   * Otherwise, the result is populated with an error object detailing
+   * the reason for the failure to resolve this particular entity.
+   *
+   * Errors that are not specific to the entity being resolved will be
+   * thrown as an exception.
+   *
+   * @see @ref resolve(const EntityReferences&, <!--
+   * --> const trait::TraitSet&, const ContextConstPtr&, <!--
+   * --> const ResolveSuccessCallback&, <!--
+   * --> const BatchElementErrorCallback& errorCallback)
+   * "Callback signature" variation for more details.
+   *
+   * @param entityReference Entity reference to query.
+   *
+   * @param traitSet The trait IDs to resolve for the supplied list of
+   * entity references. Only traits applicable to the supplied entity
+   * references will be set in the resulting data.
+   *
+   * @param context The calling context.
+   *
+   * @param errorPolicyTag  Parameter for selecting the appropriate
+   * overload (tagged dispatch idiom).
+   *
+   * @return Object containing either the populated data or an error
+   * object.
+   */
   std::variant<TraitsDataPtr, BatchElementError> resolve(
       const EntityReference& entityReference, const trait::TraitSet& traitSet,
       const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
 
-  // Multi, throws BatchElementErrors
+  /**
+   * Provides a @fqref{TraitsData} "TraitsData" populated with the
+   * available data for the requested set of traits for each given @ref
+   * entity_reference.
+   *
+   * @see @ref resolve(const EntityReferences&, <!--
+   * --> const trait::TraitSet&, const ContextConstPtr&, <!--
+   * --> const ResolveSuccessCallback&, <!--
+   * --> const BatchElementErrorCallback& errorCallback)
+   * "Callback signature" variation for more details.
+   *
+   * Any errors that occur during resolution will be immediately thrown
+   * as an exception, either from the @ref manager plugin (for errors
+   * not specific to the entity reference) or as a
+   * @fqref{BatchElementException} "BatchElementException"-derived
+   * error. This may interrupt the resolution of entity references that
+   * have not yet been processed.
+   *
+   * @param entityReferences Entity references to query.
+   *
+   * @param traitSet The trait IDs to resolve for the supplied list of
+   * entity references. Only traits applicable to the supplied entity
+   * references will be set in the resulting data.
+   *
+   * @param context The calling context.
+   *
+   * @param errorPolicyTag  Parameter for selecting the appropriate
+   * overload (tagged dispatch idiom).
+   *
+   * @return List of populated data objects.
+   */
   std::vector<TraitsDataPtr> resolve(const EntityReferences& entityReferences,
                                      const trait::TraitSet& traitSet,
                                      const ContextConstPtr& context,
                                      BatchElementErrorPolicyTag::Except errorPolicyTag = {});
 
-  // Multi, returns BatchElementError object
+  /**
+   * Provides either a populated @fqref{TraitsData} "TraitsData" or a
+   * @fqref{BatchElementError} "BatchElementError" for each given @ref
+   * entity_reference.
+   *
+   * For successful references, the corresponding element of the result
+   * is populated with the available data for the requested set of
+   * traits.
+   *
+   * Otherwise, the corresponding element of the result is populated
+   * with an error object detailing the reason for the failure to
+   * resolve that particular entity.
+   *
+   * Errors that are not specific to an entity will be thrown as an
+   * exception, failing the whole batch.
+   *
+   * @see @ref resolve(const EntityReferences&, <!--
+   * --> const trait::TraitSet&, const ContextConstPtr&, <!--
+   * --> const ResolveSuccessCallback&, <!--
+   * --> const BatchElementErrorCallback& errorCallback)
+   * "Callback signature" variation for more details.
+   *
+   * @param entityReferences Entity references to query.
+   *
+   * @param traitSet The trait IDs to resolve for the supplied list of
+   * entity references. Only traits applicable to the supplied entity
+   * references will be set in the resulting data.
+   *
+   * @param context The calling context.
+   *
+   * @param errorPolicyTag  Parameter for selecting the appropriate
+   * overload (tag dispatch idiom).
+   *
+   * @return List of objects, each containing either the populated data
+   * or an error.
+   */
   std::vector<std::variant<TraitsDataPtr, BatchElementError>> resolve(
       const EntityReferences& entityReferences, const trait::TraitSet& traitSet,
       const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
