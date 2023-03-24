@@ -6,6 +6,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <vector>
 
 #include <openassetio/export.h>
 #include <openassetio/BatchElementError.hpp>
@@ -495,12 +496,31 @@ class OPENASSETIO_CORE_EXPORT Manager {
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `resolve`.
    */
+  // Multi callback
   void resolve(const EntityReferences& entityReferences, const trait::TraitSet& traitSet,
                const ContextConstPtr& context, const ResolveSuccessCallback& successCallback,
                const BatchElementErrorCallback& errorCallback);
-  /**
-   * @}
-   */
+
+  // Singular, throws BatchElementErrors
+  TraitsDataPtr resolve(const EntityReference& entityReference, const trait::TraitSet& traitSet,
+                        const ContextConstPtr& context,
+                        BatchElementErrorPolicyTag::Except errorPolicyTag = {});
+
+  // Singular, returns BatchElementError object
+  std::variant<TraitsDataPtr, BatchElementError> resolve(
+      const EntityReference& entityReference, const trait::TraitSet& traitSet,
+      const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
+
+  // Multi, throws BatchElementErrors
+  std::vector<TraitsDataPtr> resolve(const std::vector<EntityReference>& entityReferences,
+                                     const trait::TraitSet& traitSet,
+                                     const ContextConstPtr& context,
+                                     BatchElementErrorPolicyTag::Except errorPolicyTag = {});
+
+  // Multi, returns BatchElementError object
+  std::vector<std::variant<TraitsDataPtr, BatchElementError>> resolve(
+      const std::vector<EntityReference>& entityReferences, const trait::TraitSet& traitSet,
+      const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
 
   /**
    * @name Publishing

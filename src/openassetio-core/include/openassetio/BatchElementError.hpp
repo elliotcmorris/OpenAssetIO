@@ -12,6 +12,15 @@
 
 namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
+// Write some docs DONTCOMMIT
+struct BatchElementErrorPolicyTag {
+  struct Return {};
+  struct Except {};
+
+  static constexpr Return kReturn{};
+  static constexpr Except kExcept{};
+};
+
 /**
  * Structure representing per-element batch operation errors.
  *
@@ -108,6 +117,35 @@ class BatchElementError final {
   ErrorCode code;
   /// Human-readable error message.
   Str message;
+};
+
+struct BatchElementException : std::runtime_error {
+  BatchElementException(std::size_t idx, BatchElementError err)
+      : std::runtime_error{err.message}, index{idx}, error{std::move(err)} {}
+
+  std::size_t index;
+  BatchElementError error;
+};
+
+/* DONTCOMMIT : Add Docs */
+struct UnknownBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+struct InvalidEntityReferenceBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+struct MalformedEntityReferenceBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+struct EntityAccessErrorBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+struct EntityResolutionErrorBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
 };
 
 /**

@@ -5,6 +5,7 @@
 #include <pybind11/functional.h>
 #include <pybind11/stl.h>
 
+#include <openassetio/BatchElementError.hpp>
 #include <openassetio/Context.hpp>
 #include <openassetio/TraitsData.hpp>
 #include <openassetio/hostApi/Manager.hpp>
@@ -45,8 +46,13 @@ void registerManager(const py::module& mod) {
            py::arg("entityReferenceString"))
       .def("createEntityReferenceIfValid", &Manager::createEntityReferenceIfValid,
            py::arg("entityReferenceString"))
-      .def("resolve", &Manager::resolve, py::arg("entityReferences"), py::arg("traitSet"),
-           py::arg("context").none(false), py::arg("successCallback"), py::arg("errorCallback"))
+      .def("resolve",
+           static_cast<void (Manager::*)(
+               const EntityReferences&, const trait::TraitSet&, const ContextConstPtr&,
+               const Manager::ResolveSuccessCallback&,
+               const openassetio::BatchElementErrorCallback&)>(&Manager::resolve),
+           py::arg("entityReferences"), py::arg("traitSet"), py::arg("context").none(false),
+           py::arg("successCallback"), py::arg("errorCallback"))
       .def("preflight", &Manager::preflight, py::arg("entityReferences"), py::arg("traitSet"),
            py::arg("context").none(false), py::arg("successCallback"), py::arg("errorCallback"))
       .def(
