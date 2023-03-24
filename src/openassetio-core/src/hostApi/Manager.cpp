@@ -162,7 +162,7 @@ std::variant<TraitsDataPtr, BatchElementError> hostApi::Manager::resolve(
 
 // Multi except
 std::vector<TraitsDataPtr> hostApi::Manager::resolve(
-    const std::vector<EntityReference> &entityReferences, const trait::TraitSet &traitSet,
+    const EntityReferences &entityReferences, const trait::TraitSet &traitSet,
     const ContextConstPtr &context,
     [[maybe_unused]] BatchElementErrorPolicyTag::Except errorPolicyTag) {
   std::vector<TraitsDataPtr> resolveResult;
@@ -183,7 +183,7 @@ std::vector<TraitsDataPtr> hostApi::Manager::resolve(
 
 // Multi variant
 std::vector<std::variant<TraitsDataPtr, BatchElementError>> hostApi::Manager::resolve(
-    const std::vector<EntityReference> &entityReferences, const trait::TraitSet &traitSet,
+    const EntityReferences &entityReferences, const trait::TraitSet &traitSet,
     const ContextConstPtr &context,
     [[maybe_unused]] BatchElementErrorPolicyTag::Return errorPolicyTag) {
   std::vector<std::variant<TraitsDataPtr, BatchElementError>> resolveResult;

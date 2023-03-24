@@ -512,14 +512,14 @@ class OPENASSETIO_CORE_EXPORT Manager {
       const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
 
   // Multi, throws BatchElementErrors
-  std::vector<TraitsDataPtr> resolve(const std::vector<EntityReference>& entityReferences,
+  std::vector<TraitsDataPtr> resolve(const EntityReferences& entityReferences,
                                      const trait::TraitSet& traitSet,
                                      const ContextConstPtr& context,
                                      BatchElementErrorPolicyTag::Except errorPolicyTag = {});
 
   // Multi, returns BatchElementError object
   std::vector<std::variant<TraitsDataPtr, BatchElementError>> resolve(
-      const std::vector<EntityReference>& entityReferences, const trait::TraitSet& traitSet,
+      const EntityReferences& entityReferences, const trait::TraitSet& traitSet,
       const ContextConstPtr& context, BatchElementErrorPolicyTag::Return errorPolicyTag);
 
   /**
