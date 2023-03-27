@@ -12,11 +12,22 @@
 
 namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
-// Write some docs DONTCOMMIT
+/**
+ * Tag dispatching structure intended for use selecting appropriate
+ * overloads for various error-handling modes.
+ *
+ * Many OpenAssetIO functions provide options as to whether errors are
+ * handled via throwing exceptions, or by returning a variant based
+ * result object.
+ */
 struct BatchElementErrorPolicyTag {
   struct Return {};
   struct Except {};
 
+  /**
+   * Static instantiations of the dispatch tags, conveniences to avoid
+   * the need to construct a new type for each method call.
+   */
   static constexpr Return kReturn{};
   static constexpr Except kExcept{};
 };
@@ -119,31 +130,63 @@ class BatchElementError final {
   Str message;
 };
 
+/**
+ * Exception base that ties together a @ref BatchElementError and an
+ * index. When thrown from a function, indicates that a particular
+ * element has caused an error. The specific element that has errored
+ * is indicated by the index attribute, relative to the input container.
+ */
 struct BatchElementException : std::runtime_error {
   BatchElementException(std::size_t idx, BatchElementError err)
       : std::runtime_error{err.message}, index{idx}, error{std::move(err)} {}
 
+  /**
+   * Index describing which batch element has caused an error.
+   */
   std::size_t index;
+
+  /**
+   * Object describing the nature of the specific error.
+   */
   BatchElementError error;
 };
 
-/* DONTCOMMIT : Add Docs */
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kUnknown
+ */
 struct UnknownBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
 };
 
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kInvalidEntityReference
+ */
 struct InvalidEntityReferenceBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
 };
 
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kMalformedEntityReference
+ */
 struct MalformedEntityReferenceBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
 };
 
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kEntityAccessError
+ */
 struct EntityAccessErrorBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
 };
 
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kEntityResolutionError
+ */
 struct EntityResolutionErrorBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
 };
