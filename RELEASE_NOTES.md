@@ -38,6 +38,11 @@ v1.0.0-alpha.xx
 
 ### Improvements
 
+- Added `openassetio.internal.python-bridge-no-openassetio-module-test`
+  ctest project to support testing python interop functions in an
+  environment without the `openassetio` module loaded.
+  [#798](https://github.com/OpenAssetIO/OpenAssetIO/issues/798)
+
 - Added support for running `ctest` when a python venv is used to
   determine which Python distribution to build against.
 
