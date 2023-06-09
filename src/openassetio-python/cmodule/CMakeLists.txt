@@ -21,6 +21,10 @@ set_target_properties(
     VERSION ""
 )
 
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+  set_target_properties(openassetio-python-module PROPERTIES DEBUG_POSTFIX "")
+endif()
+
 add_library(${PROJECT_NAME}::openassetio-python-module ALIAS openassetio-python-module)
 
 set(_install_subdir "${OPENASSETIO_PYTHON_SITEDIR}/openassetio")
