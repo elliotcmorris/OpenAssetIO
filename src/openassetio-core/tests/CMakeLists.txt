@@ -22,6 +22,7 @@ target_sources(openassetio-core-cpp-test-exe
     ContextTest.cpp
     TraitsDataTest.cpp
     hostApi/ManagerTest.cpp
+    hostApi/PagerTest.cpp
     managerApi/HostTest.cpp
     managerApi/HostSessionTest.cpp
     managerApi/ManagerStateBaseTest.cpp
