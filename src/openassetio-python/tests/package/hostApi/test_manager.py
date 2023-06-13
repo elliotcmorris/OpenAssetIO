@@ -36,7 +36,7 @@ from openassetio import (
     TraitsData,
     managerApi,
 )
-from openassetio.hostApi import Manager
+from openassetio.hostApi import Manager, EntityReferencePager
 
 
 ## @todo Remove comments regarding Entity methods when splitting them from core API
@@ -565,6 +565,180 @@ class Test_Manager_getWithRelationships:
             )
 
         assert not mock_manager_interface.mock.getWithRelationships.called
+
+
+class Test_Manager_getWithRelationshipPaged:
+    def test_wraps_the_corresponding_method_of_the_held_interface(
+        self,
+        manager,
+        a_ref,
+        mock_manager_interface,
+        mock_entity_reference_pager_interface,
+        a_host_session,
+        a_batch_element_error,
+        an_empty_traitsdata,
+        an_entity_trait_set,
+        an_entity_reference_pager,
+        a_context,
+        invoke_getWithRelationshipPaged_success_cb,
+        invoke_getWithRelationshipPaged_error_cb,
+    ):
+        # pylint: disable=too-many-locals
+
+        two_refs = [a_ref, a_ref]
+        page_size = 3
+
+        success_callback = mock.Mock()
+        error_callback = mock.Mock()
+
+        method = mock_manager_interface.mock.getWithRelationshipPaged
+
+        def call_callbacks(*_args):
+            invoke_getWithRelationshipPaged_success_cb(0, mock_entity_reference_pager_interface)
+            invoke_getWithRelationshipPaged_error_cb(1, a_batch_element_error)
+
+        method.side_effect = call_callbacks
+
+        manager.getWithRelationshipPaged(
+            two_refs,
+            an_empty_traitsdata,
+            page_size,
+            a_context,
+            success_callback,
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        method.assert_called_once_with(
+            two_refs,
+            an_empty_traitsdata,
+            an_entity_trait_set,
+            page_size,
+            a_context,
+            a_host_session,
+            mock.ANY,
+            mock.ANY,
+        )
+        success_callback.assert_called_once_with(0, mock.ANY)
+
+        # Additional assert to check cpp constructed Pager object is as
+        # expected.
+        pager = success_callback.call_args[0][1]
+        pager.next()
+        mock_entity_reference_pager_interface.mock.next.assert_called_once_with(a_host_session)
+
+        error_callback.assert_called_once_with(1, a_batch_element_error)
+
+        mock_manager_interface.mock.reset_mock()
+
+        # Check optional resultTraitSet
+
+        manager.getWithRelationshipPaged(
+            two_refs,
+            an_empty_traitsdata,
+            page_size,
+            a_context,
+            success_callback,
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        method.assert_called_once_with(
+            two_refs,
+            an_empty_traitsdata,
+            an_entity_trait_set,
+            page_size,
+            a_context,
+            a_host_session,
+            mock.ANY,  # success
+            mock.ANY,  # error
+        )
+
+
+class Test_Manager_getWithRelationshipsPaged:
+    def test_wraps_the_corresponding_method_of_the_held_interface(
+        self,
+        manager,
+        mock_manager_interface,
+        a_host_session,
+        a_ref,
+        a_batch_element_error,
+        an_empty_traitsdata,
+        an_entity_trait_set,
+        mock_entity_reference_pager_interface,
+        an_entity_reference_pager,
+        a_context,
+        invoke_getWithRelationshipsPaged_success_cb,
+        invoke_getWithRelationshipsPaged_error_cb,
+    ):
+        two_datas = [an_empty_traitsdata, an_empty_traitsdata]
+        page_size = 3
+
+        success_callback = mock.Mock()
+        error_callback = mock.Mock()
+
+        method = mock_manager_interface.mock.getWithRelationshipsPaged
+
+        def call_callbacks(*_args):
+            invoke_getWithRelationshipsPaged_success_cb(0, mock_entity_reference_pager_interface)
+            invoke_getWithRelationshipsPaged_error_cb(1, a_batch_element_error)
+
+        method.side_effect = call_callbacks
+
+        manager.getWithRelationshipsPaged(
+            a_ref,
+            two_datas,
+            page_size,
+            a_context,
+            success_callback,
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        method.assert_called_once_with(
+            a_ref,  # entityref,
+            two_datas,
+            an_entity_trait_set,
+            page_size,
+            a_context,
+            a_host_session,
+            mock.ANY,  # success
+            mock.ANY,  # error
+        )
+
+        success_callback.assert_called_once_with(0, mock.ANY)
+
+        # Additional assert to check cpp constructed Pager object is as
+        # expected.
+        pager = success_callback.call_args[0][1]
+        pager.next()
+        mock_entity_reference_pager_interface.mock.next.assert_called_once_with(a_host_session)
+        error_callback.assert_called_once_with(1, a_batch_element_error)
+
+        mock_manager_interface.mock.reset_mock()
+
+        # Check optional resultTraitSet
+
+        manager.getWithRelationshipsPaged(
+            a_ref,
+            two_datas,
+            page_size,
+            a_context,
+            success_callback,
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        method.assert_called_once_with(
+            a_ref,  # entityref
+            two_datas,
+            an_entity_trait_set,
+            page_size,
+            a_context,
+            a_host_session,
+            mock.ANY,  # success
+            mock.ANY,  # error
+        )
 
 
 class Test_Manager_BatchElementErrorPolicyTag:
@@ -2584,6 +2758,11 @@ def manager(mock_manager_interface, a_host_session):
 
 
 @pytest.fixture
+def an_entity_reference_pager(mock_entity_reference_pager_interface, a_host_session):
+    return EntityReferencePager(mock_entity_reference_pager_interface, a_host_session)
+
+
+@pytest.fixture
 def an_empty_traitsdata():
     return TraitsData(set())
 
@@ -2650,6 +2829,42 @@ def some_refs(manager):
 @pytest.fixture
 def some_different_refs(manager):
     return [manager.createEntityReference("asset://e"), manager.createEntityReference("asset://f")]
+
+
+@pytest.fixture
+def invoke_getWithRelationshipPaged_success_cb(mock_manager_interface):
+    def invoke(idx, entityReferencesPagerInterface):
+        callback = mock_manager_interface.mock.getWithRelationshipPaged.call_args[0][6]
+        callback(idx, entityReferencesPagerInterface)
+
+    return invoke
+
+
+@pytest.fixture
+def invoke_getWithRelationshipsPaged_error_cb(mock_manager_interface):
+    def invoke(idx, batch_element_error):
+        callback = mock_manager_interface.mock.getWithRelationshipsPaged.call_args[0][7]
+        callback(idx, batch_element_error)
+
+    return invoke
+
+
+@pytest.fixture
+def invoke_getWithRelationshipsPaged_success_cb(mock_manager_interface):
+    def invoke(idx, entityReferencesPagerInterface):
+        callback = mock_manager_interface.mock.getWithRelationshipsPaged.call_args[0][6]
+        callback(idx, entityReferencesPagerInterface)
+
+    return invoke
+
+
+@pytest.fixture
+def invoke_getWithRelationshipPaged_error_cb(mock_manager_interface):
+    def invoke(idx, batch_element_error):
+        callback = mock_manager_interface.mock.getWithRelationshipPaged.call_args[0][7]
+        callback(idx, batch_element_error)
+
+    return invoke
 
 
 @pytest.fixture

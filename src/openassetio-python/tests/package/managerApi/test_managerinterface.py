@@ -249,6 +249,96 @@ class Test_ManagerInterface_getWithRelationships:
             success_callback.reset_mock()
 
 
+class Test_ManagerInterface_getWithRelationshipPaged:
+    def test_method_defined_in_cpp(self, method_introspector):
+        assert not method_introspector.is_defined_in_python(
+            ManagerInterface.getWithRelationshipPaged
+        )
+        assert method_introspector.is_implemented_once(
+            ManagerInterface, "getWithRelationshipPaged"
+        )
+
+    def test_returns_dummy_pager_for_each_input(self, manager_interface, a_host_session):
+        success_callback = Mock()
+        error_callback = Mock()
+
+        for refs in (
+            [],
+            [EntityReference("first")],
+            [EntityReference("second"), EntityReference("third")],
+        ):
+            manager_interface.getWithRelationshipPaged(
+                refs,
+                TraitsData(),
+                set(),
+                1,
+                Context(),
+                a_host_session,
+                success_callback,
+                error_callback,
+            )
+
+            error_callback.assert_not_called()
+
+            # The default pager behaviour is to return no data and
+            # report no new pages.
+            for idx, x in enumerate(refs):
+                print(idx)
+                pager = success_callback.call_args_list[idx][0][1]
+                assert pager.hasNext(a_host_session) == False
+                assert pager.get(a_host_session) == []
+                pager.next(a_host_session)
+                assert pager.hasNext(a_host_session) == False
+                assert pager.get(a_host_session) == []
+
+            success_callback.reset_mock()
+
+
+class Test_ManagerInterface_getWithRelationships:
+    def test_method_defined_in_cpp(self, method_introspector):
+        assert not method_introspector.is_defined_in_python(
+            ManagerInterface.getWithRelationshipPaged
+        )
+        assert method_introspector.is_implemented_once(
+            ManagerInterface, "getWithRelationshipsPaged"
+        )
+
+    def test_returns_dummy_pager_for_each_input(self, manager_interface, a_host_session):
+        success_callback = Mock()
+        error_callback = Mock()
+
+        for rels in (
+            [],
+            [TraitsData()],
+            [TraitsData(), TraitsData()],
+        ):
+            manager_interface.getWithRelationshipsPaged(
+                EntityReference(""),
+                rels,
+                set(),
+                1,
+                Context(),
+                a_host_session,
+                success_callback,
+                error_callback,
+            )
+
+            error_callback.assert_not_called()
+
+            # The default pager behaviour is to return no data and
+            # report no new pages.
+            for idx, x in enumerate(rels):
+                print(idx)
+                pager = success_callback.call_args_list[idx][0][1]
+                assert pager.hasNext(a_host_session) == False
+                assert pager.get(a_host_session) == []
+                pager.next(a_host_session)
+                assert pager.hasNext(a_host_session) == False
+                assert pager.get(a_host_session) == []
+
+            success_callback.reset_mock()
+
+
 class Test_ManagerInterface__createEntityReference:
     def test_method_defined_in_cpp(self, method_introspector):
         assert not method_introspector.is_defined_in_python(
