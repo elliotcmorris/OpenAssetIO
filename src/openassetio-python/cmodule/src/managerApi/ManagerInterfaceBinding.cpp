@@ -165,10 +165,10 @@ void registerManagerInterface(const py::module& mod) {
       .def("resolve", &ManagerInterface::resolve, py::arg("entityReferences"), py::arg("traitSet"),
            py::arg("context").none(false), py::arg("hostSession").none(false),
            py::arg("successCallback"), py::arg("errorCallback"))
-      .def("getWithRelationship", &ManagerInterface::getWithRelationship,
-           py::arg("entityReferences"), py::arg("relationshipTraitsData").none(false),
-           py::arg("context").none(false), py::arg("hostSession").none(false),
-           py::arg("successCallback"), py::arg("errorCallback"), py::arg("resultTraitSet"))
+      .def("getWithRelationship", py::arg("entityReferences"),
+           py::arg("relationshipTraitsData").none(false), py::arg("context").none(false),
+           py::arg("hostSession").none(false), py::arg("successCallback"),
+           py::arg("errorCallback"), py::arg("resultTraitSet"))
       .def("getWithRelationships", &ManagerInterface::getWithRelationships,
            py::arg("entityReference"), py::arg("relationshipTraitsDatas"),
            py::arg("context").none(false), py::arg("hostSession").none(false),
