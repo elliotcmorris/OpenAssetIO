@@ -15,6 +15,7 @@
 
 OPENASSETIO_FWD_DECLARE(ManagerStateBase)
 OPENASSETIO_FWD_DECLARE(managerApi, ManagerInterface)
+OPENASSETIO_FWD_DECLARE(managerApi, EntityReferencePagerInterface)
 OPENASSETIO_FWD_DECLARE(log, LoggerInterface)
 OPENASSETIO_FWD_DECLARE(hostApi, HostInterface)
 OPENASSETIO_FWD_DECLARE(hostApi, ManagerImplementationFactoryInterface)
@@ -36,7 +37,8 @@ OPENASSETIO_FWD_DECLARE(hostApi, ManagerImplementationFactoryInterface)
 using RetainCommonPyArgs = openassetio::RetainPyArgs<
     openassetio::log::LoggerInterfacePtr, openassetio::ManagerStateBasePtr,
     openassetio::managerApi::ManagerInterfacePtr, openassetio::hostApi::HostInterfacePtr,
-    openassetio::hostApi::ManagerImplementationFactoryInterfacePtr>;
+    openassetio::hostApi::ManagerImplementationFactoryInterfacePtr,
+    openassetio::managerApi::EntityReferencePagerInterfacePtr>;
 
 /// Concise pybind alias.
 namespace py = pybind11;
@@ -85,3 +87,9 @@ void registerEntityReference(const py::module& mod);
 
 /// Register the BatchElementError type with Python.
 void registerBatchElementError(py::module& mod);
+
+/// Register the EntityReferencePager class with Python.
+void registerEntityReferencePager(const py::module& mod);
+
+/// Register the EntityReferencePagerInterface class with Python.
+void registerEntityReferencePagerInterface(const py::module& mod);

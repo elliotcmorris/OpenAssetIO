@@ -37,6 +37,7 @@ from openassetio import (
     managerApi,
 )
 from openassetio.hostApi import Manager, EntityReferencePager
+from openassetio.managerApi import EntityReferencePagerInterface
 
 
 ## @todo Remove comments regarding Entity methods when splitting them from core API
@@ -567,6 +568,26 @@ class Test_Manager_getWithRelationships:
         assert not mock_manager_interface.mock.getWithRelationships.called
 
 
+class DyingPagerInterface(EntityReferencePagerInterface):
+    """
+    Throwaway pager interface def, so we can create a temporary
+    interface intended to fall out of scope.
+    Any interface would do, but this avoids ugly imports.
+    """
+
+    def __init__(self):
+        super().__init__()
+
+    def hasNext(self, hostSession):
+        return False
+
+    def get(self, hostSession):
+        return []
+
+    def next(self, hostSession):
+        pass
+
+
 class Test_Manager_getWithRelationshipPaged:
     def test_wraps_the_corresponding_method_of_the_held_interface(
         self,
@@ -654,6 +675,51 @@ class Test_Manager_getWithRelationshipPaged:
             mock.ANY,  # error
         )
 
+    def test_pager_kept_alive_by_retaining_shared_ptr(
+        self,
+        manager,
+        a_ref,
+        mock_manager_interface,
+        a_host_session,
+        a_batch_element_error,
+        an_empty_traitsdata,
+        an_entity_trait_set,
+        a_context,
+        invoke_getWithRelationshipPaged_success_cb,
+        invoke_getWithRelationshipPaged_error_cb,
+    ):
+        # pylint: disable=too-many-locals
+
+        two_refs = [a_ref, a_ref]
+        page_size = 3
+
+        error_callback = mock.Mock()
+
+        method = mock_manager_interface.mock.getWithRelationshipPaged
+
+        def call_callbacks(*_args):
+            invoke_getWithRelationshipPaged_success_cb(0, DyingPagerInterface())
+            invoke_getWithRelationshipPaged_error_cb(1, a_batch_element_error)
+
+        method.side_effect = call_callbacks
+
+        pagers = []
+        manager.getWithRelationshipPaged(
+            two_refs,
+            an_empty_traitsdata,
+            page_size,
+            a_context,
+            lambda _idx, pager: pagers.append(pager),
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        """
+        Without PyRetainingSharedPtr, will raise
+        "Tried to call pure virtual function "EntityReferencePagerInterface::get"
+        """
+        pagers[0].get()
+
 
 class Test_Manager_getWithRelationshipsPaged:
     def test_wraps_the_corresponding_method_of_the_held_interface(
@@ -739,6 +805,48 @@ class Test_Manager_getWithRelationshipsPaged:
             mock.ANY,  # success
             mock.ANY,  # error
         )
+
+    def test_pager_kept_alive_by_retaining_shared_ptr(
+        self,
+        manager,
+        mock_manager_interface,
+        a_ref,
+        a_batch_element_error,
+        an_empty_traitsdata,
+        an_entity_trait_set,
+        a_context,
+        invoke_getWithRelationshipsPaged_success_cb,
+        invoke_getWithRelationshipsPaged_error_cb,
+    ):
+        two_datas = [an_empty_traitsdata, an_empty_traitsdata]
+        page_size = 3
+
+        error_callback = mock.Mock()
+
+        method = mock_manager_interface.mock.getWithRelationshipsPaged
+
+        def call_callbacks(*_args):
+            invoke_getWithRelationshipsPaged_success_cb(0, DyingPagerInterface())
+            invoke_getWithRelationshipsPaged_error_cb(1, a_batch_element_error)
+
+        method.side_effect = call_callbacks
+
+        pagers = []
+        manager.getWithRelationshipsPaged(
+            a_ref,
+            two_datas,
+            page_size,
+            a_context,
+            lambda _idx, pager: pagers.append(pager),
+            error_callback,
+            resultTraitSet=an_entity_trait_set,
+        )
+
+        """
+        Without PyRetainingSharedPtr, will raise
+        "Tried to call pure virtual function "EntityReferencePagerInterface::get"
+        """
+        pagers[0].get()
 
 
 class Test_Manager_BatchElementErrorPolicyTag:
