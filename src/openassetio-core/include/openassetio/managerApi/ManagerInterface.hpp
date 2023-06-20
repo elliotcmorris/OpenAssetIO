@@ -888,6 +888,8 @@ class OPENASSETIO_CORE_EXPORT ManagerInterface {
    *
    * @param context The calling context.
    *
+   * @param hostSession The API session.
+   *
    * @param successCallback Callback that should be called for each
    * successful relationship query. It should be given the corresponding
    * index of the entity reference in @p entityReferences as well as a
@@ -900,17 +902,17 @@ class OPENASSETIO_CORE_EXPORT ManagerInterface {
    * of size specified by @p pageSize
    *
    * If there are no relations, the pager should have no pages. The
-   * callback should be called on the same thread that initiated the call
-   * to `getWithRelationship`. To access the data, retrieve the @ref
-   * EntityReferencePager from the callback, and use its interface to
-   * traverse pages.
+   * callback should be called on the same thread that initiated the
+   * call to `getWithRelationship`. To access the data, retrieve the
+   * @fqref{hostApi.EntityReferencePager} from the callback, and use its
+   * interface to traverse pages.
    *
    * @param errorCallback Callback that should be called for each failed
-   * relationship query. It should be given the corresponding index of the
-   * entity reference in @p entityReferences along with a populated
+   * relationship query. It should be given the corresponding index of
+   * the entity reference in @p entityReferences along with a populated
    * BatchElementError (see @ref BatchElementError.ErrorCode
-   * "ErrorCodes"). The callback should be called on the same thread that
-   * initiated the call to `getWithRelationship`.
+   * "ErrorCodes"). The callback should be called on the same thread
+   * that initiated the call to `getWithRelationship`.
    *
    * @param resultTraitSet A hint as to what traits the returned
    * entities should have.
@@ -939,6 +941,8 @@ class OPENASSETIO_CORE_EXPORT ManagerInterface {
    *
    * @param context The calling context.
    *
+   * @param hostSession The API session.
+   *
    * @param successCallback Callback that should be called for each
    * successful relationship query. It should be given the corresponding
    * index of the relationship in @p relationshipTraitsDatas as well as
@@ -952,8 +956,8 @@ class OPENASSETIO_CORE_EXPORT ManagerInterface {
    * If there are no relations, the pager should have no pages. The
    * callback should be called on the same thread that initiated the
    * call to `getWithRelationship`. To access the data, retrieve the
-   * @ref EntityReferencePager from the callback, and use its interface
-   * to traverse pages.
+   * @fqref{hostApi.EntityReferencePager} from the callback, and use its
+   * interface to traverse pages.
    *
    * @param errorCallback Callback that should be called for each failed
    * relationship query. It should be given the corresponding index of
