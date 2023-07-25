@@ -29,8 +29,9 @@ jobs:
 
     # Build the book
     - name: Build the book
+      working-directory: ./doc/tutorials
       run: |
-        jupyter-book build doc/tutorials/tutorialtest
+        jupyter-book build tutorialtest
 
     # Deploy the book's HTML to gh-pages branch
     - name: GitHub Pages action
