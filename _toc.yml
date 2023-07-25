@@ -1,0 +1,9 @@
+root: CONDUCT
+entries:
+  - file: CONTRIBUTING
+  - file: README
+  - file: tutorialtest/content
+    entries:
+      - file: tutorialtest/intro
+      - file: tutorialtest/markdown
+      - file: tutorialtest/markdown-notebooks
