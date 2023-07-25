@@ -1,5 +1,0 @@
-BasedOnStyle: Google
-Language: Cpp
-Standard: c++17
-ColumnLimit: 99
-IncludeBlocks: Preserve

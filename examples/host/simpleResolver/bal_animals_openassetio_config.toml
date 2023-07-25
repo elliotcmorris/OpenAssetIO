@@ -1,8 +1,0 @@
-# SPDX-License-Identifier: Apache-2.0
-# Copyright 2022 The Foundry Visionmongers Ltd
-
-[manager]
-identifier = "org.openassetio.examples.manager.bal"
-
-[manager.settings]
-library_path = "${config_dir}/bal_animals.json"

@@ -1,9 +1,0 @@
-[manager]
-identifier = "identifier.from.toml.file"
-
-[manager.settings]
-a_string = "Hello 🐈"
-a_float = 3.141579
-a_bool = false
-a_int = 42
-a_config_path_twice = "${config_dir}/my/🐈/${config_dir}"
