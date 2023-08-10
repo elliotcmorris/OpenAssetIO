@@ -41,10 +41,32 @@ class OPENASSETIO_CORE_EXPORT Context final {
   /**
    * @name Access Pattern
    */
-  enum class Access { kRead, kReadMultiple, kWrite, kWriteMultiple, kUnknown };
+  enum class Access {
+    /**
+     * Host intends to read data
+     */
+    kRead,
+    /**
+     * Host intends to write data. This should be the default choice for
+     * write, unless the conditions for @ref Access.kCreateRelated are
+     * met.
+     */
+    kWrite,
+    /**
+     * Hosts intends to write related data against a reference to
+     * another entity. This is a specialization of `kWrite`, and should
+     * be used when the host knows up front that it wishes to to publish
+     * a new related entity, and not an update to an existing entity.
+     * The canonical motivating example for this is that host may know
+     * it wishes to publish a new subfolder inside an existing folder,
+     * and not an update to said existing folder.
+     */
+    kCreateRelated,
+    /// Unknown Access Pattern
+    kUnknown
+  };
 
-  static constexpr std::array kAccessNames{"read", "readMultiple", "write", "writeMultiple",
-                                           "unknown"};
+  static constexpr std::array kAccessNames{"read", "write", "createRelated", "unknown"};
   /// @}
 
   /**
@@ -67,10 +89,29 @@ class OPENASSETIO_CORE_EXPORT Context final {
   /**
    * Describes what the @ref host is intending to do with the data.
    *
-   * For example, when passed to resolve, it specifies if the @ref
-   * host is about to read or write. When configuring a BrowserWidget,
-   * then it will hint as to whether the Host is wanting to choose a
-   * new file name to save, or open an existing one.
+   * For example, when passed to resolve, it specifies if the @ref host
+   * is about to read or write. When configuring a BrowserWidget, then
+   * it will hint as to whether the Host is wanting to choose a new file
+   * name to save, or open an existing one.
+   *
+   * When the access mode is one of the write patterns, the manager is
+   * expected to abide by the following procedure:
+   *
+   * 1. When the reference points to a non-existant entity, that entity
+   * should be created.
+   *
+   * 2. When the reference points to an existing entity:
+   *    * a. When the access is @ref Access.kCreateRelated a new
+   *      entity is created in relation to the target entity where
+   *      logical (eg: a child), or error is emitted.
+   *
+   *    * b. When the access is @ref Access.kWrite :
+   *        * i. When the trait set of the existing entity matches that
+   *          of the new entity, the entity should be updated (possibly
+   *          by versioning up). If this is not permitted, an error
+   *          should be emitted.
+   *        * ii. When the trait set of the existing entity does not
+   *          match, behave as per 2a.
    */
   Access access;
 
@@ -133,30 +174,19 @@ class OPENASSETIO_CORE_EXPORT Context final {
                                        TraitsDataPtr locale = nullptr,
                                        managerApi::ManagerStateBasePtr managerState = nullptr);
   /**
-   * @return `true` if the context is any of the 'Read' based access
-   * patterns. If the access is unknown (Access::kUnknown), then `false`
+   * @return `true` if the context is a 'Read' based access
+   * pattern. If the access is unknown (Access::kUnknown), then `false`
    * is returned.
    */
-  [[nodiscard]] inline bool isForRead() const {
-    return access == Access::kRead || access == Access::kReadMultiple;
-  }
+  [[nodiscard]] inline bool isForRead() const { return access == Access::kRead; }
 
   /**
-   * @return `true` if the context is any of the 'Write' based access
-   * patterns. If the access is unknown (Access::kUnknown), then `false`
+   * @return `true` if the context is a 'Write' based access
+   * pattern. If the access is unknown (Access::kUnknown), then `false`
    * is returned.
    */
   [[nodiscard]] inline bool isForWrite() const {
-    return access == Access::kWrite || access == Access::kWriteMultiple;
-  }
-
-  /**
-   * @return `true` if the context is any of the 'Multiple' based access
-   * patterns. If the access is unknown (Access::kUnknown), then `false`
-   * is returned.
-   */
-  [[nodiscard]] inline bool isForMultiple() const {
-    return access == Access::kReadMultiple || access == Access::kWriteMultiple;
+    return access == Access::kWrite || access == Access::kCreateRelated;
   }
 
  private:

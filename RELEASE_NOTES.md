@@ -3,6 +3,19 @@ Release Notes
 
 v1.0.0-alpha.x
 ---------------
+### Breaking changes
+
+- Removed `Context.Access.kWriteMultiple` and
+ `Context.Access.kReadMultiple`access patterns, due to not having
+ coherent use cases.
+ [1016](https://github.com/OpenAssetIO/OpenAssetIO/issues/1016)
+
+### New Features
+
+- Added `Context.Access.kCreateRelated` access pattern, to support use
+  cases where host wants to specify a new related entity is created,
+  but differentiation based on traitset comparison is not possible.
+  [1016](https://github.com/OpenAssetIO/OpenAssetIO/issues/1016)
 
 ### Improvements
 
