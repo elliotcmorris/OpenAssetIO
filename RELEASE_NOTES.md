@@ -22,6 +22,11 @@ v1.0.0-alpha.x
  coherent use cases.
  [1016](https://github.com/OpenAssetIO/OpenAssetIO/issues/1016)
 
+ - Migrated `ManagerInterface`/`Manager` `updateTerminology` to C++ with
+  Python bindings. Tweaked interface to be returned based rather than
+  out-param based.
+  [#996](https://github.com/OpenAssetIO/OpenAssetIO/issues/996)
+
 ### New Features
 
 - Added `Context.Access.kCreateRelated` access pattern, to  indicate

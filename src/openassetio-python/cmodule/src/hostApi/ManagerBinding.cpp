@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-// Copyright 2013-2022 The Foundry Visionmongers Ltd
+// Copyright 2013-2023 The Foundry Visionmongers Ltd
 #include <algorithm>
 
 #include <pybind11/functional.h>
@@ -82,6 +82,7 @@ void registerManager(const py::module& mod) {
            py::arg("entityReferenceString"))
       .def("createEntityReferenceIfValid", &Manager::createEntityReferenceIfValid,
            py::arg("entityReferenceString"))
+      .def("updateTerminology", &Manager::updateTerminology, py::arg("terms"))
       .def("resolve",
            static_cast<void (Manager::*)(
                const EntityReferences&, const trait::TraitSet&, const ContextConstPtr&,
