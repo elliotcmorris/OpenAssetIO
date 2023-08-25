@@ -22,9 +22,7 @@ C++ and Python Manager and HostSession classes.
 """
 
 from .. import _openassetio  # pylint: disable=no-name-in-module
-
-from .Manager import Manager
-
+from openassetio.hostApi.Manager import Manager
 
 __all__ = ["ManagerFactory"]
 
