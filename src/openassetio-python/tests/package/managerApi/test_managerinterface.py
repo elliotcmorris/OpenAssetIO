@@ -25,7 +25,7 @@ from unittest.mock import Mock, call
 
 import pytest
 
-from openassetio import EntityReference, TraitsData, Context, BatchElementError, errors
+from openassetio import EntityReference, TraitsData, Context, errors
 from openassetio.managerApi import (
     ManagerInterface,
     ManagerStateBase,
@@ -178,8 +178,8 @@ class Test_ManagerInterface_defaultEntityReference:
 
         success_callback.assert_not_called()
 
-        expected_code = BatchElementError.ErrorCode.kEntityAccessError
-        expected_err = BatchElementError(
+        expected_code = errors.BatchElementError.ErrorCode.kEntityAccessError
+        expected_err = errors.BatchElementError(
             expected_code, "Manager does not implement defaultEntityReference"
         )
         error_callback.assert_has_calls([call(i, expected_err) for i in range(len(traitsSets))])
@@ -203,8 +203,8 @@ class Test_ManagerInterface_defaultEntityReference:
 
         success_callback.assert_not_called()
 
-        expected_code = BatchElementError.ErrorCode.kEntityAccessError
-        expected_err = BatchElementError(
+        expected_code = errors.BatchElementError.ErrorCode.kEntityAccessError
+        expected_err = errors.BatchElementError(
             expected_code, "Manager does not implement defaultEntityReference"
         )
         error_callback.assert_has_calls([call(i, expected_err) for i in range(len(traitsSets))])

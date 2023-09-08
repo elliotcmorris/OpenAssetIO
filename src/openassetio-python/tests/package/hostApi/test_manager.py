@@ -25,6 +25,14 @@ from unittest import mock
 import pytest
 
 from openassetio import (
+    Context,
+    EntityReference,
+    TraitsData,
+    managerApi,
+    constants,
+    access,
+)
+from openassetio.errors import (
     UnknownBatchElementException,
     InvalidEntityReferenceBatchElementException,
     MalformedEntityReferenceBatchElementException,
@@ -33,16 +41,10 @@ from openassetio import (
     InvalidPreflightHintBatchElementException,
     InvalidTraitSetBatchElementException,
     BatchElementError,
-    Context,
-    EntityReference,
-    TraitsData,
-    managerApi,
-    constants,
-    access,
+    InputValidationException,
 )
 from openassetio.hostApi import Manager, EntityReferencePager
 from openassetio.managerApi import EntityReferencePagerInterface
-from openassetio.errors import InputValidationException
 
 
 ## @todo Remove comments regarding Entity methods when splitting them from core API

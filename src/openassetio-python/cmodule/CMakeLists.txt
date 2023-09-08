@@ -46,7 +46,7 @@ target_sources(
     src/ContextBinding.cpp
     src/EntityReferenceBinding.cpp
     src/TraitsDataBinding.cpp
-    src/errors/errorsBinding.cpp
+    src/errors/exceptionsBinding.cpp
     src/errors/BatchElementErrorBinding.cpp
     src/hostApi/EntityReferencePagerBinding.cpp
     src/hostApi/ManagerBinding.cpp

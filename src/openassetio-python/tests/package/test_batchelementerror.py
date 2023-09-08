@@ -23,7 +23,7 @@ Tests for the BatchElementError type.
 
 import pytest
 
-from openassetio import (
+from openassetio.errors import (
     BatchElementError,
     BatchElementException,
     UnknownBatchElementException,

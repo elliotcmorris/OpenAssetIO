@@ -26,3 +26,21 @@ InputValidationException = _openassetio.errors.InputValidationException
 ConfigurationException = _openassetio.errors.ConfigurationException
 NotImplementedException = _openassetio.errors.NotImplementedException
 UnhandledException = _openassetio.errors.UnhandledException
+BatchElementError = _openassetio.errors.BatchElementError
+BatchElementException = _openassetio.errors.BatchElementException
+UnknownBatchElementException = _openassetio.errors.UnknownBatchElementException
+InvalidEntityReferenceBatchElementException = (
+    _openassetio.errors.InvalidEntityReferenceBatchElementException
+)
+
+MalformedEntityReferenceBatchElementException = (
+    _openassetio.errors.MalformedEntityReferenceBatchElementException
+)
+EntityAccessErrorBatchElementException = _openassetio.errors.EntityAccessErrorBatchElementException
+EntityResolutionErrorBatchElementException = (
+    _openassetio.errors.EntityResolutionErrorBatchElementException
+)
+InvalidPreflightHintBatchElementException = (
+    _openassetio.errors.InvalidPreflightHintBatchElementException
+)
+InvalidTraitSetBatchElementException = _openassetio.errors.InvalidTraitSetBatchElementException
