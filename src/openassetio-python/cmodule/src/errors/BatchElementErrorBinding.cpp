@@ -9,7 +9,7 @@
 #include <openassetio/errors/BatchElementError.hpp>
 #include <openassetio/errors/exceptions.hpp>
 
-#include "_openassetio.hpp"
+#include "../_openassetio.hpp"
 
 void registerBatchElementError(py::module &mod) {
   using openassetio::errors::BatchElementError;
