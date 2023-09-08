@@ -7,6 +7,7 @@
 #include <pybind11/pybind11.h>
 
 #include <openassetio/errors/BatchElementError.hpp>
+#include <openassetio/errors/exceptions.hpp>
 
 #include "_openassetio.hpp"
 
@@ -61,14 +62,14 @@ class BatchElementException(RuntimeError):
   // the string literal above.
   const py::object pyBatchElementException = mod.attr("BatchElementException");
 
-  using openassetio::BatchElementException;
-  using openassetio::EntityAccessErrorBatchElementException;
-  using openassetio::EntityResolutionErrorBatchElementException;
-  using openassetio::InvalidEntityReferenceBatchElementException;
-  using openassetio::InvalidPreflightHintBatchElementException;
-  using openassetio::InvalidTraitSetBatchElementException;
-  using openassetio::MalformedEntityReferenceBatchElementException;
-  using openassetio::UnknownBatchElementException;
+  using openassetio::errors::BatchElementException;
+  using openassetio::errors::EntityAccessErrorBatchElementException;
+  using openassetio::errors::EntityResolutionErrorBatchElementException;
+  using openassetio::errors::InvalidEntityReferenceBatchElementException;
+  using openassetio::errors::InvalidPreflightHintBatchElementException;
+  using openassetio::errors::InvalidTraitSetBatchElementException;
+  using openassetio::errors::MalformedEntityReferenceBatchElementException;
+  using openassetio::errors::UnknownBatchElementException;
 
   // Register a new exception type using `BatchElementException` base
   // class created above. Note that this is not sufficient to cause C++

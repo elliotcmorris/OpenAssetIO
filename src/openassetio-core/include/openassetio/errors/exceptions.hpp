@@ -4,8 +4,10 @@
 
 #include <stdexcept>
 #include <string>
+#include <utility>
 
 #include <openassetio/export.h>
+#include <openassetio/errors/BatchElementError.hpp>
 #include <openassetio/typedefs.hpp>
 
 namespace openassetio {
@@ -63,6 +65,96 @@ struct OPENASSETIO_CORE_EXPORT NotImplementedException : OpenAssetIOException {
  */
 struct OPENASSETIO_CORE_EXPORT UnhandledException : OpenAssetIOException {
   using OpenAssetIOException::OpenAssetIOException;
+};
+/**
+ * @}
+ */
+
+/**
+ * @name Batch Element Exceptions
+ *
+ * @{
+ */
+
+/**
+ * Exception base that ties together a @ref BatchElementError and an
+ * index.
+ *
+ * When thrown from a function, indicates that a particular
+ * element has caused an error. The specific element that has errored
+ * is indicated by the index attribute, relative to the input container.
+ */
+struct OPENASSETIO_CORE_EXPORT BatchElementException : std::runtime_error {
+  BatchElementException(std::size_t idx, BatchElementError err)
+      : std::runtime_error{err.message}, index{idx}, error{std::move(err)} {}
+
+  /**
+   * Index describing which batch element has caused an error.
+   */
+  std::size_t index;
+
+  /**
+   * Object describing the nature of the specific error.
+   */
+  BatchElementError error;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kUnknown
+ */
+struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kInvalidEntityReference
+ */
+struct OPENASSETIO_CORE_EXPORT InvalidEntityReferenceBatchElementException
+    : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kMalformedEntityReference
+ */
+struct OPENASSETIO_CORE_EXPORT MalformedEntityReferenceBatchElementException
+    : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kEntityAccessError
+ */
+struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kEntityResolutionError
+ */
+struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kInvalidPreflightHint
+ */
+struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
+};
+
+/**
+ * Exception equivalent of
+ * @ref BatchElementError.ErrorCode.kInvalidTraitSet
+ */
+struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
+  using BatchElementException::BatchElementException;
 };
 
 /**

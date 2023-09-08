@@ -23,26 +23,26 @@ namespace {
 void throwFromBatchElementError(std::size_t index, BatchElementError error) {
   switch (error.code) {
     case BatchElementError::ErrorCode::kUnknown:
-      throw UnknownBatchElementException(index, std::move(error));
+      throw errors::UnknownBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kInvalidEntityReference:
-      throw InvalidEntityReferenceBatchElementException(index, std::move(error));
+      throw errors::InvalidEntityReferenceBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kMalformedEntityReference:
-      throw MalformedEntityReferenceBatchElementException(index, std::move(error));
+      throw errors::MalformedEntityReferenceBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kEntityAccessError:
-      throw EntityAccessErrorBatchElementException(index, std::move(error));
+      throw errors::EntityAccessErrorBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kEntityResolutionError:
-      throw EntityResolutionErrorBatchElementException(index, std::move(error));
+      throw errors::EntityResolutionErrorBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kInvalidPreflightHint:
-      throw InvalidPreflightHintBatchElementException(index, std::move(error));
+      throw errors::InvalidPreflightHintBatchElementException(index, std::move(error));
     case BatchElementError::ErrorCode::kInvalidTraitSet:
-      throw InvalidTraitSetBatchElementException(index, std::move(error));
+      throw errors::InvalidTraitSetBatchElementException(index, std::move(error));
     default:
       std::string exceptionMessage = "Invalid BatchElementError. Code: ";
       exceptionMessage += std::to_string(static_cast<int>(error.code));
       exceptionMessage += " Message: ";
       exceptionMessage += error.message;
       error.message = std::move(exceptionMessage);
-      throw UnknownBatchElementException{index, std::move(error)};
+      throw errors::UnknownBatchElementException{index, std::move(error)};
   }
 }
 

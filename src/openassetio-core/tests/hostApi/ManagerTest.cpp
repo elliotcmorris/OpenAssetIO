@@ -10,6 +10,7 @@
 
 #include <openassetio/Context.hpp>
 #include <openassetio/TraitsData.hpp>
+#include <openassetio/errors/exceptions.hpp>
 #include <openassetio/hostApi/HostInterface.hpp>
 #include <openassetio/hostApi/Manager.hpp>
 #include <openassetio/log/LoggerInterface.hpp>
@@ -244,7 +245,7 @@ SCENARIO("Resolving entities") {
       WHEN("singular resolve is called with default errorPolicyTag") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(manager->resolve(ref, traits, resolveAccess, context),
-                               openassetio::MalformedEntityReferenceBatchElementException,
+                               openassetio::errors::MalformedEntityReferenceBatchElementException,
                                Catch::Message("Error Message"));
         }
       }
@@ -253,7 +254,7 @@ SCENARIO("Resolving entities") {
           CHECK_THROWS_MATCHES(
               manager->resolve(ref, traits, resolveAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Error Message"));
         }
       }
@@ -294,7 +295,7 @@ SCENARIO("Resolving entities") {
       WHEN("batch resolve is called with default errorPolicyTag") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(manager->resolve(refs, traits, resolveAccess, context),
-                               openassetio::MalformedEntityReferenceBatchElementException,
+                               openassetio::errors::MalformedEntityReferenceBatchElementException,
                                Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -303,7 +304,7 @@ SCENARIO("Resolving entities") {
           CHECK_THROWS_MATCHES(
               manager->resolve(refs, traits, resolveAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -335,18 +336,19 @@ struct BatchElementErrorMapping {
 
 TEMPLATE_TEST_CASE(
     "BatchElementError conversion to exceptions when resolving", "",
-    (BatchElementErrorMapping<openassetio::UnknownBatchElementException, ErrorCode::kUnknown>),
-    (BatchElementErrorMapping<openassetio::InvalidEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::UnknownBatchElementException,
+                              ErrorCode::kUnknown>),
+    (BatchElementErrorMapping<openassetio::errors::InvalidEntityReferenceBatchElementException,
                               ErrorCode::kInvalidEntityReference>),
-    (BatchElementErrorMapping<openassetio::MalformedEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::MalformedEntityReferenceBatchElementException,
                               ErrorCode::kMalformedEntityReference>),
-    (BatchElementErrorMapping<openassetio::EntityAccessErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityAccessErrorBatchElementException,
                               ErrorCode::kEntityAccessError>),
-    (BatchElementErrorMapping<openassetio::EntityResolutionErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityResolutionErrorBatchElementException,
                               ErrorCode::kEntityResolutionError>),
-    (BatchElementErrorMapping<openassetio::InvalidPreflightHintBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidPreflightHintBatchElementException,
                               ErrorCode::kInvalidPreflightHint>),
-    (BatchElementErrorMapping<openassetio::InvalidTraitSetBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidTraitSetBatchElementException,
                               ErrorCode::kInvalidTraitSet>)) {
   namespace hostApi = openassetio::hostApi;
   using trompeloeil::_;
@@ -575,7 +577,7 @@ SCENARIO("Preflighting entities") {
       WHEN("singular preflight is called with default errorPolicyTag") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(manager->preflight(ref, traitsData, publishingAccess, context),
-                               openassetio::MalformedEntityReferenceBatchElementException,
+                               openassetio::errors::MalformedEntityReferenceBatchElementException,
                                Catch::Message("Error Message"));
         }
       }
@@ -584,7 +586,7 @@ SCENARIO("Preflighting entities") {
           CHECK_THROWS_MATCHES(
               manager->preflight(ref, traitsData, publishingAccess, context,
                                  hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Error Message"));
         }
       }
@@ -621,7 +623,7 @@ SCENARIO("Preflighting entities") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(
               manager->preflight(threeRefs, threeTraitsDatas, publishingAccess, context),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -630,7 +632,7 @@ SCENARIO("Preflighting entities") {
           CHECK_THROWS_MATCHES(
               manager->preflight(threeRefs, threeTraitsDatas, publishingAccess, context,
                                  hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -654,18 +656,19 @@ SCENARIO("Preflighting entities") {
 
 TEMPLATE_TEST_CASE(
     "BatchElementError conversion to exceptions when preflighting", "",
-    (BatchElementErrorMapping<openassetio::UnknownBatchElementException, ErrorCode::kUnknown>),
-    (BatchElementErrorMapping<openassetio::InvalidEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::UnknownBatchElementException,
+                              ErrorCode::kUnknown>),
+    (BatchElementErrorMapping<openassetio::errors::InvalidEntityReferenceBatchElementException,
                               ErrorCode::kInvalidEntityReference>),
-    (BatchElementErrorMapping<openassetio::MalformedEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::MalformedEntityReferenceBatchElementException,
                               ErrorCode::kMalformedEntityReference>),
-    (BatchElementErrorMapping<openassetio::EntityAccessErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityAccessErrorBatchElementException,
                               ErrorCode::kEntityAccessError>),
-    (BatchElementErrorMapping<openassetio::EntityResolutionErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityResolutionErrorBatchElementException,
                               ErrorCode::kEntityResolutionError>),
-    (BatchElementErrorMapping<openassetio::InvalidPreflightHintBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidPreflightHintBatchElementException,
                               ErrorCode::kInvalidPreflightHint>),
-    (BatchElementErrorMapping<openassetio::InvalidTraitSetBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidTraitSetBatchElementException,
                               ErrorCode::kInvalidTraitSet>)) {
   namespace hostApi = openassetio::hostApi;
   using trompeloeil::_;
@@ -911,7 +914,7 @@ SCENARIO("Registering entities") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(
               manager->register_(ref, singleTraitsData, publishingAccess, context),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Error Message"));
         }
       }
@@ -920,7 +923,7 @@ SCENARIO("Registering entities") {
           CHECK_THROWS_MATCHES(
               manager->register_(ref, singleTraitsData, publishingAccess, context,
                                  hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Error Message"));
         }
       }
@@ -961,7 +964,7 @@ SCENARIO("Registering entities") {
         THEN("an exception is thrown") {
           CHECK_THROWS_MATCHES(
               manager->register_(refs, threeTraitsDatas, publishingAccess, context),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -970,7 +973,7 @@ SCENARIO("Registering entities") {
           CHECK_THROWS_MATCHES(
               manager->register_(refs, threeTraitsDatas, publishingAccess, context,
                                  hostApi::Manager::BatchElementErrorPolicyTag::kException),
-              openassetio::MalformedEntityReferenceBatchElementException,
+              openassetio::errors::MalformedEntityReferenceBatchElementException,
               Catch::Message("Malformed Mock Error🤖"));
         }
       }
@@ -994,18 +997,19 @@ SCENARIO("Registering entities") {
 
 TEMPLATE_TEST_CASE(
     "BatchElementError conversion to exceptions when registering", "",
-    (BatchElementErrorMapping<openassetio::UnknownBatchElementException, ErrorCode::kUnknown>),
-    (BatchElementErrorMapping<openassetio::InvalidEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::UnknownBatchElementException,
+                              ErrorCode::kUnknown>),
+    (BatchElementErrorMapping<openassetio::errors::InvalidEntityReferenceBatchElementException,
                               ErrorCode::kInvalidEntityReference>),
-    (BatchElementErrorMapping<openassetio::MalformedEntityReferenceBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::MalformedEntityReferenceBatchElementException,
                               ErrorCode::kMalformedEntityReference>),
-    (BatchElementErrorMapping<openassetio::EntityAccessErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityAccessErrorBatchElementException,
                               ErrorCode::kEntityAccessError>),
-    (BatchElementErrorMapping<openassetio::EntityResolutionErrorBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::EntityResolutionErrorBatchElementException,
                               ErrorCode::kEntityResolutionError>),
-    (BatchElementErrorMapping<openassetio::InvalidPreflightHintBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidPreflightHintBatchElementException,
                               ErrorCode::kInvalidPreflightHint>),
-    (BatchElementErrorMapping<openassetio::InvalidTraitSetBatchElementException,
+    (BatchElementErrorMapping<openassetio::errors::InvalidTraitSetBatchElementException,
                               ErrorCode::kInvalidTraitSet>)) {
   namespace hostApi = openassetio::hostApi;
   using trompeloeil::_;
