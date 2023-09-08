@@ -20,21 +20,21 @@ namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
 namespace {
 // Takes a BatchElementError and throws an equivalent exception.
-void throwFromBatchElementError(std::size_t index, BatchElementError error) {
+void throwFromBatchElementError(std::size_t index, errors::BatchElementError error) {
   switch (error.code) {
-    case BatchElementError::ErrorCode::kUnknown:
+    case errors::BatchElementError::ErrorCode::kUnknown:
       throw errors::UnknownBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kInvalidEntityReference:
+    case errors::BatchElementError::ErrorCode::kInvalidEntityReference:
       throw errors::InvalidEntityReferenceBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kMalformedEntityReference:
+    case errors::BatchElementError::ErrorCode::kMalformedEntityReference:
       throw errors::MalformedEntityReferenceBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kEntityAccessError:
+    case errors::BatchElementError::ErrorCode::kEntityAccessError:
       throw errors::EntityAccessErrorBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kEntityResolutionError:
+    case errors::BatchElementError::ErrorCode::kEntityResolutionError:
       throw errors::EntityResolutionErrorBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kInvalidPreflightHint:
+    case errors::BatchElementError::ErrorCode::kInvalidPreflightHint:
       throw errors::InvalidPreflightHintBatchElementException(index, std::move(error));
-    case BatchElementError::ErrorCode::kInvalidTraitSet:
+    case errors::BatchElementError::ErrorCode::kInvalidTraitSet:
       throw errors::InvalidTraitSetBatchElementException(index, std::move(error));
     default:
       std::string exceptionMessage = "Invalid BatchElementError. Code: ";
@@ -197,7 +197,7 @@ TraitsDataPtr hostApi::Manager::resolve(
       [&resolveResult]([[maybe_unused]] std::size_t index, TraitsDataPtr data) {
         resolveResult = std::move(data);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         throwFromBatchElementError(index, std::move(error));
       });
 
@@ -205,17 +205,17 @@ TraitsDataPtr hostApi::Manager::resolve(
 }
 
 // Singular variant
-std::variant<BatchElementError, TraitsDataPtr> hostApi::Manager::resolve(
+std::variant<errors::BatchElementError, TraitsDataPtr> hostApi::Manager::resolve(
     const EntityReference &entityReference, const trait::TraitSet &traitSet,
     const access::ResolveAccess resolveAccess, const ContextConstPtr &context,
     [[maybe_unused]] const BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::variant<BatchElementError, TraitsDataPtr> resolveResult;
+  std::variant<errors::BatchElementError, TraitsDataPtr> resolveResult;
   resolve(
       {entityReference}, traitSet, resolveAccess, context,
       [&resolveResult]([[maybe_unused]] std::size_t index, TraitsDataPtr data) {
         resolveResult = std::move(data);
       },
-      [&resolveResult]([[maybe_unused]] std::size_t index, BatchElementError error) {
+      [&resolveResult]([[maybe_unused]] std::size_t index, errors::BatchElementError error) {
         resolveResult = std::move(error);
       });
 
@@ -235,7 +235,7 @@ std::vector<TraitsDataPtr> hostApi::Manager::resolve(
       [&resolveResult](std::size_t index, TraitsDataPtr data) {
         resolveResult[index] = std::move(data);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         // Implemented as if FAILFAST is true.
         throwFromBatchElementError(index, std::move(error));
       });
@@ -244,18 +244,18 @@ std::vector<TraitsDataPtr> hostApi::Manager::resolve(
 }
 
 // Multi variant
-std::vector<std::variant<BatchElementError, TraitsDataPtr>> hostApi::Manager::resolve(
+std::vector<std::variant<errors::BatchElementError, TraitsDataPtr>> hostApi::Manager::resolve(
     const EntityReferences &entityReferences, const trait::TraitSet &traitSet,
     const access::ResolveAccess resolveAccess, const ContextConstPtr &context,
     [[maybe_unused]] const BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::vector<std::variant<BatchElementError, TraitsDataPtr>> resolveResult;
+  std::vector<std::variant<errors::BatchElementError, TraitsDataPtr>> resolveResult;
   resolveResult.resize(entityReferences.size());
   resolve(
       entityReferences, traitSet, resolveAccess, context,
       [&resolveResult](std::size_t index, TraitsDataPtr data) {
         resolveResult[index] = std::move(data);
       },
-      [&resolveResult](std::size_t index, BatchElementError error) {
+      [&resolveResult](std::size_t index, errors::BatchElementError error) {
         resolveResult[index] = std::move(error);
       });
 
@@ -377,24 +377,24 @@ EntityReference Manager::preflight(
       [&result]([[maybe_unused]] std::size_t index, EntityReference preflightedRef) {
         result = std::move(preflightedRef);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         throwFromBatchElementError(index, std::move(error));
       });
 
   return result;
 }
 
-std::variant<BatchElementError, EntityReference> Manager::preflight(
+std::variant<errors::BatchElementError, EntityReference> Manager::preflight(
     const EntityReference &entityReference, const TraitsDataPtr &traitsHint,
     const access::PublishingAccess publishingAccess, const ContextConstPtr &context,
     [[maybe_unused]] const Manager::BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::variant<BatchElementError, EntityReference> result;
+  std::variant<errors::BatchElementError, EntityReference> result;
   preflight(
       {entityReference}, {traitsHint}, publishingAccess, context,
       [&result]([[maybe_unused]] std::size_t index, EntityReference preflightedRef) {
         result = std::move(preflightedRef);
       },
-      [&result]([[maybe_unused]] std::size_t index, BatchElementError error) {
+      [&result]([[maybe_unused]] std::size_t index, errors::BatchElementError error) {
         result = std::move(error);
       });
 
@@ -413,7 +413,7 @@ EntityReferences Manager::preflight(
       [&results](std::size_t index, EntityReference preflightedRef) {
         results[index] = std::move(preflightedRef);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         // Implemented as if FAILFAST is true.
         throwFromBatchElementError(index, std::move(error));
       });
@@ -421,18 +421,18 @@ EntityReferences Manager::preflight(
   return results;
 }
 
-std::vector<std::variant<BatchElementError, EntityReference>> Manager::preflight(
+std::vector<std::variant<errors::BatchElementError, EntityReference>> Manager::preflight(
     const EntityReferences &entityReferences, const trait::TraitsDatas &traitsHints,
     const access::PublishingAccess publishingAccess, const ContextConstPtr &context,
     [[maybe_unused]] const Manager::BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::vector<std::variant<BatchElementError, EntityReference>> results;
+  std::vector<std::variant<errors::BatchElementError, EntityReference>> results;
   results.resize(entityReferences.size());
   preflight(
       entityReferences, traitsHints, publishingAccess, context,
       [&results](std::size_t index, EntityReference entityReference) {
         results[index] = std::move(entityReference);
       },
-      [&results](std::size_t index, BatchElementError error) {
+      [&results](std::size_t index, errors::BatchElementError error) {
         results[index] = std::move(error);
       });
 
@@ -468,7 +468,7 @@ EntityReference hostApi::Manager::register_(
       [&result]([[maybe_unused]] std::size_t index, EntityReference registeredRef) {
         result = std::move(registeredRef);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         throwFromBatchElementError(index, std::move(error));
       });
 
@@ -476,17 +476,17 @@ EntityReference hostApi::Manager::register_(
 }
 
 // Singular variant
-std::variant<BatchElementError, EntityReference> hostApi::Manager::register_(
+std::variant<errors::BatchElementError, EntityReference> hostApi::Manager::register_(
     const EntityReference &entityReference, const TraitsDataPtr &entityTraitsData,
     const access::PublishingAccess publishingAccess, const ContextConstPtr &context,
     [[maybe_unused]] const BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::variant<BatchElementError, EntityReference> result;
+  std::variant<errors::BatchElementError, EntityReference> result;
   register_(
       {entityReference}, {entityTraitsData}, publishingAccess, context,
       [&result]([[maybe_unused]] std::size_t index, EntityReference registeredRef) {
         result = std::move(registeredRef);
       },
-      [&result]([[maybe_unused]] std::size_t index, BatchElementError error) {
+      [&result]([[maybe_unused]] std::size_t index, errors::BatchElementError error) {
         result = std::move(error);
       });
 
@@ -506,7 +506,7 @@ std::vector<EntityReference> hostApi::Manager::register_(
       [&result](std::size_t index, EntityReference registeredRef) {
         result[index] = std::move(registeredRef);
       },
-      [](std::size_t index, BatchElementError error) {
+      [](std::size_t index, errors::BatchElementError error) {
         // Implemented as if FAILFAST is true.
         throwFromBatchElementError(index, std::move(error));
       });
@@ -515,18 +515,20 @@ std::vector<EntityReference> hostApi::Manager::register_(
 }
 
 // Multi variant
-std::vector<std::variant<BatchElementError, EntityReference>> hostApi::Manager::register_(
+std::vector<std::variant<errors::BatchElementError, EntityReference>> hostApi::Manager::register_(
     const EntityReferences &entityReferences, const trait::TraitsDatas &entityTraitsDatas,
     const access::PublishingAccess publishingAccess, const ContextConstPtr &context,
     [[maybe_unused]] const BatchElementErrorPolicyTag::Variant &errorPolicyTag) {
-  std::vector<std::variant<BatchElementError, EntityReference>> result;
+  std::vector<std::variant<errors::BatchElementError, EntityReference>> result;
   result.resize(entityReferences.size());
   register_(
       entityReferences, entityTraitsDatas, publishingAccess, context,
       [&result](std::size_t index, EntityReference registeredRef) {
         result[index] = std::move(registeredRef);
       },
-      [&result](std::size_t index, BatchElementError error) { result[index] = std::move(error); });
+      [&result](std::size_t index, errors::BatchElementError error) {
+        result[index] = std::move(error);
+      });
 
   return result;
 }

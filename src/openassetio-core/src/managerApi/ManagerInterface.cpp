@@ -67,8 +67,8 @@ void ManagerInterface::defaultEntityReference(
     const BatchElementErrorCallback& errorCallback) {
   const auto size = traitSets.size();
   for (size_t i = 0; i < size; ++i) {
-    BatchElementError err{BatchElementError::ErrorCode::kEntityAccessError,
-                          "Manager does not implement defaultEntityReference"};
+    errors::BatchElementError err{errors::BatchElementError::ErrorCode::kEntityAccessError,
+                                  "Manager does not implement defaultEntityReference"};
     errorCallback(i, std::move(err));
   }
 }

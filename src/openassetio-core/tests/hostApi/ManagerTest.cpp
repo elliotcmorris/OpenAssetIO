@@ -125,7 +125,7 @@ SCENARIO("Resolving entities") {
         THEN("returned TraitsData is as expected") { CHECK(expected.get() == actual.get()); }
       }
       WHEN("singular resolve is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::TraitsDataPtr> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::TraitsDataPtr> actual =
             manager->resolve(ref, traits, resolveAccess, context,
                              hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected TraitsData") {
@@ -167,7 +167,8 @@ SCENARIO("Resolving entities") {
         THEN("returned list of TraitsDatas is as expected") { CHECK(expectedVec == actualVec); }
       }
       WHEN("batch resolve is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::TraitsDataPtr>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::TraitsDataPtr>>
             actualVec = manager->resolve(refs, traits, resolveAccess, context,
                                          hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected TraitsDatas") {
@@ -216,7 +217,8 @@ SCENARIO("Resolving entities") {
         }
       }
       WHEN("batch resolve is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::TraitsDataPtr>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::TraitsDataPtr>>
             actualVec = manager->resolve(refs, traits, resolveAccess, context,
                                          hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants is ordered in index order") {
@@ -234,8 +236,9 @@ SCENARIO("Resolving entities") {
       const openassetio::EntityReference ref = openassetio::EntityReference{"testReference"};
       const openassetio::EntityReferences refs = {ref};
 
-      openassetio::BatchElementError expected{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference, "Error Message"};
+      openassetio::errors::BatchElementError expected{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
+          "Error Message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
@@ -259,12 +262,12 @@ SCENARIO("Resolving entities") {
         }
       }
       WHEN("singular resolve is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::TraitsDataPtr> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::TraitsDataPtr> actual =
             manager->resolve(ref, traits, resolveAccess, context,
                              hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected BatchElementError") {
-          CHECK(std::holds_alternative<openassetio::BatchElementError>(actual));
-          const auto& actualVal = std::get<openassetio::BatchElementError>(actual);
+          CHECK(std::holds_alternative<openassetio::errors::BatchElementError>(actual));
+          const auto& actualVal = std::get<openassetio::errors::BatchElementError>(actual);
           CHECK(expected == actualVal);
         }
       }
@@ -278,11 +281,11 @@ SCENARIO("Resolving entities") {
 
       const openassetio::TraitsDataPtr expectedValue2 = openassetio::TraitsData::make();
       expectedValue2->addTrait("aTestTrait");
-      const openassetio::BatchElementError expectedError0{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference,
+      const openassetio::errors::BatchElementError expectedError0{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
           "Malformed Mock Error🤖"};
-      const openassetio::BatchElementError expectedError1{
-          openassetio::BatchElementError::ErrorCode::kEntityAccessError,
+      const openassetio::errors::BatchElementError expectedError1{
+          openassetio::errors::BatchElementError::ErrorCode::kEntityAccessError,
           "Entity Access Error Message"};
 
       // With mixed callback side effect
@@ -309,14 +312,15 @@ SCENARIO("Resolving entities") {
         }
       }
       WHEN("batch resolve is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::TraitsDataPtr>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::TraitsDataPtr>>
             actualVec = manager->resolve(refs, traits, resolveAccess, context,
                                          hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected objects") {
-          auto error0 = std::get<openassetio::BatchElementError>(actualVec[0]);
+          auto error0 = std::get<openassetio::errors::BatchElementError>(actualVec[0]);
           CHECK(error0 == expectedError0);
 
-          auto error1 = std::get<openassetio::BatchElementError>(actualVec[1]);
+          auto error1 = std::get<openassetio::errors::BatchElementError>(actualVec[1]);
           CHECK(error1 == expectedError1);
 
           CHECK(std::get<openassetio::TraitsDataPtr>(actualVec[2]) == expectedValue2);
@@ -326,7 +330,7 @@ SCENARIO("Resolving entities") {
   }
 }
 
-using ErrorCode = openassetio::BatchElementError::ErrorCode;
+using ErrorCode = openassetio::errors::BatchElementError::ErrorCode;
 
 template <class T, ErrorCode C>
 struct BatchElementErrorMapping {
@@ -370,7 +374,8 @@ TEMPLATE_TEST_CASE(
       const openassetio::EntityReferences refs = {ref};
       const auto resolveAccess = openassetio::access::ResolveAccess::kRead;
 
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error message"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode,
+                                                                 "Some error message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
@@ -399,7 +404,7 @@ TEMPLATE_TEST_CASE(
                                                   openassetio::EntityReference{"testReference2"}};
       const auto resolveAccess = openassetio::access::ResolveAccess::kRead;
 
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
@@ -467,7 +472,7 @@ SCENARIO("Preflighting entities") {
         THEN("returned entity reference is as expected") { CHECK(expected == actual); }
       }
       WHEN("singular preflight is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::EntityReference> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference> actual =
             manager->preflight(ref, traitsData, publishingAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected entity reference") {
@@ -506,7 +511,8 @@ SCENARIO("Preflighting entities") {
         }
       }
       WHEN("batch preflight is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->preflight(threeRefs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected entity references") {
@@ -549,7 +555,8 @@ SCENARIO("Preflighting entities") {
         }
       }
       WHEN("batch preflight is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->preflight(threeRefs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants is ordered in index order") {
@@ -565,8 +572,9 @@ SCENARIO("Preflighting entities") {
     GIVEN(
         "manager plugin will encounter an entity-specific error when next preflighting a "
         "reference") {
-      const openassetio::BatchElementError expected{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference, "Error Message"};
+      const openassetio::errors::BatchElementError expected{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
+          "Error Message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, preflight(openassetio::EntityReferences{ref},
@@ -591,12 +599,12 @@ SCENARIO("Preflighting entities") {
         }
       }
       WHEN("singular preflight is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::EntityReference> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference> actual =
             manager->preflight(ref, traitsData, publishingAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected BatchElementError") {
-          CHECK(std::holds_alternative<openassetio::BatchElementError>(actual));
-          const auto& actualVal = std::get<openassetio::BatchElementError>(actual);
+          CHECK(std::holds_alternative<openassetio::errors::BatchElementError>(actual));
+          const auto& actualVal = std::get<openassetio::errors::BatchElementError>(actual);
           CHECK(expected == actualVal);
         }
       }
@@ -605,11 +613,11 @@ SCENARIO("Preflighting entities") {
         "manager plugin will encounter entity-specific errors when next preflighting multiple "
         "references") {
       const openassetio::EntityReference expectedValue2{"ref2"};
-      const openassetio::BatchElementError expectedError0{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference,
+      const openassetio::errors::BatchElementError expectedError0{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
           "Malformed Mock Error🤖"};
-      const openassetio::BatchElementError expectedError1{
-          openassetio::BatchElementError::ErrorCode::kEntityAccessError,
+      const openassetio::errors::BatchElementError expectedError1{
+          openassetio::errors::BatchElementError::ErrorCode::kEntityAccessError,
           "Entity Access Error Message"};
 
       // With mixed callback side effect
@@ -637,14 +645,15 @@ SCENARIO("Preflighting entities") {
         }
       }
       WHEN("batch preflight is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->preflight(threeRefs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected objects") {
-          auto error0 = std::get<openassetio::BatchElementError>(actualVec[0]);
+          auto error0 = std::get<openassetio::errors::BatchElementError>(actualVec[0]);
           CHECK(error0 == expectedError0);
 
-          auto error1 = std::get<openassetio::BatchElementError>(actualVec[1]);
+          auto error1 = std::get<openassetio::errors::BatchElementError>(actualVec[1]);
           CHECK(error1 == expectedError1);
 
           CHECK(std::get<openassetio::EntityReference>(actualVec[2]) == expectedValue2);
@@ -697,7 +706,8 @@ TEMPLATE_TEST_CASE(
     AND_GIVEN(
         "manager plugin will encounter an entity-specific error when next preflighting a "
         "reference") {
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error message"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode,
+                                                                 "Some error message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, preflight(openassetio::EntityReferences{ref},
@@ -723,7 +733,7 @@ TEMPLATE_TEST_CASE(
     AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next preflighting multiple "
         "references") {
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, preflight(threeRefs, threeTraitsDatas, publishingAccess,
@@ -793,7 +803,7 @@ SCENARIO("Registering entities") {
         THEN("returned EntityReference is as expected") { CHECK(expected == actual); }
       }
       WHEN("singular register is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::EntityReference> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference> actual =
             manager->register_(ref, singleTraitsData, publishingAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected EntityReference") {
@@ -836,7 +846,8 @@ SCENARIO("Registering entities") {
         }
       }
       WHEN("batch register is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->register_(refs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected EntityReferences") {
@@ -883,7 +894,8 @@ SCENARIO("Registering entities") {
         }
       }
       WHEN("batch register is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->register_(refs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants is ordered in index order") {
@@ -902,8 +914,9 @@ SCENARIO("Registering entities") {
       const openassetio::EntityReference ref = openassetio::EntityReference{"testReference"};
       const openassetio::EntityReferences refs = {ref};
 
-      const openassetio::BatchElementError expected{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference, "Error Message"};
+      const openassetio::errors::BatchElementError expected{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
+          "Error Message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, register_(refs, singleTraitsDatas, publishingAccess,
@@ -928,12 +941,12 @@ SCENARIO("Registering entities") {
         }
       }
       WHEN("singular register is called with kVariant errorPolicyTag") {
-        std::variant<openassetio::BatchElementError, openassetio::EntityReference> actual =
+        std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference> actual =
             manager->register_(ref, singleTraitsData, publishingAccess, context,
                                hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned variant contains the expected BatchElementError") {
-          CHECK(std::holds_alternative<openassetio::BatchElementError>(actual));
-          const auto& actualVal = std::get<openassetio::BatchElementError>(actual);
+          CHECK(std::holds_alternative<openassetio::errors::BatchElementError>(actual));
+          const auto& actualVal = std::get<openassetio::errors::BatchElementError>(actual);
           CHECK(expected == actualVal);
         }
       }
@@ -946,11 +959,11 @@ SCENARIO("Registering entities") {
                                                   openassetio::EntityReference{"ref3"}};
 
       const openassetio::EntityReference expectedValue2{"expectedRef2"};
-      const openassetio::BatchElementError expectedError0{
-          openassetio::BatchElementError::ErrorCode::kMalformedEntityReference,
+      const openassetio::errors::BatchElementError expectedError0{
+          openassetio::errors::BatchElementError::ErrorCode::kMalformedEntityReference,
           "Malformed Mock Error🤖"};
-      const openassetio::BatchElementError expectedError1{
-          openassetio::BatchElementError::ErrorCode::kEntityAccessError,
+      const openassetio::errors::BatchElementError expectedError1{
+          openassetio::errors::BatchElementError::ErrorCode::kEntityAccessError,
           "Entity Access Error Message"};
 
       // With mixed callback side effect
@@ -978,14 +991,15 @@ SCENARIO("Registering entities") {
         }
       }
       WHEN("batch register is called with kVariant errorPolicyTag") {
-        std::vector<std::variant<openassetio::BatchElementError, openassetio::EntityReference>>
+        std::vector<
+            std::variant<openassetio::errors::BatchElementError, openassetio::EntityReference>>
             actualVec = manager->register_(refs, threeTraitsDatas, publishingAccess, context,
                                            hostApi::Manager::BatchElementErrorPolicyTag::kVariant);
         THEN("returned lists of variants contains the expected objects") {
-          auto error0 = std::get<openassetio::BatchElementError>(actualVec[0]);
+          auto error0 = std::get<openassetio::errors::BatchElementError>(actualVec[0]);
           CHECK(error0 == expectedError0);
 
-          auto error1 = std::get<openassetio::BatchElementError>(actualVec[1]);
+          auto error1 = std::get<openassetio::errors::BatchElementError>(actualVec[1]);
           CHECK(error1 == expectedError1);
 
           CHECK(std::get<openassetio::EntityReference>(actualVec[2]) == expectedValue2);
@@ -1035,7 +1049,8 @@ TEMPLATE_TEST_CASE(
       auto singleTraitsData = openassetio::TraitsData::make(traits);
       const openassetio::trait::TraitsDatas singleTraitsDatas = {singleTraitsData};
 
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error message"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode,
+                                                                 "Some error message"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, register_(refs, singleTraitsDatas, publishingAccess,
@@ -1068,7 +1083,7 @@ TEMPLATE_TEST_CASE(
                                                   openassetio::EntityReference{"ref2"},
                                                   openassetio::EntityReference{"ref3"}};
 
-      const openassetio::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
+      const openassetio::errors::BatchElementError expectedError{kExpectedErrorCode, "Some error"};
 
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,

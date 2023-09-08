@@ -455,7 +455,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * The appropriate error code should be used for these errors. See
    * @fqref{BatchElementError.ErrorCode} "ErrorCode".
    */
-  using BatchElementErrorCallback = std::function<void(std::size_t, BatchElementError)>;
+  using BatchElementErrorCallback = std::function<void(std::size_t, errors::BatchElementError)>;
   /**
    * @}
    */
@@ -772,7 +772,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @return Object containing either the populated data or an error
    * object.
    */
-  std::variant<BatchElementError, TraitsDataPtr> resolve(
+  std::variant<errors::BatchElementError, TraitsDataPtr> resolve(
       const EntityReference& entityReference, const trait::TraitSet& traitSet,
       access::ResolveAccess resolveAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
@@ -856,7 +856,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @return List of objects, each containing either the populated data
    * or an error.
    */
-  std::vector<std::variant<BatchElementError, TraitsDataPtr>> resolve(
+  std::vector<std::variant<errors::BatchElementError, TraitsDataPtr>> resolve(
       const EntityReferences& entityReferences, const trait::TraitSet& traitSet,
       access::ResolveAccess resolveAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
@@ -1427,7 +1427,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * object detailing the reason for the failure of this particular
    * entity.
    */
-  std::variant<BatchElementError, EntityReference> preflight(
+  std::variant<errors::BatchElementError, EntityReference> preflight(
       const EntityReference& entityReference, const TraitsDataPtr& traitsHint,
       access::PublishingAccess publishingAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
@@ -1523,7 +1523,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * an error object detailing the reason for the failure of that
    * particular entity.
    */
-  std::vector<std::variant<BatchElementError, EntityReference>> preflight(
+  std::vector<std::variant<errors::BatchElementError, EntityReference>> preflight(
       const EntityReferences& entityReferences, const trait::TraitsDatas& traitsHints,
       access::PublishingAccess publishingAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
@@ -1720,7 +1720,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * the failure of this particular entity.
    */
   // NOLINTNEXTLINE(readability-identifier-naming)
-  std::variant<BatchElementError, EntityReference> register_(
+  std::variant<errors::BatchElementError, EntityReference> register_(
       const EntityReference& entityReference, const TraitsDataPtr& entityTraitsData,
       access::PublishingAccess publishingAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
@@ -1817,7 +1817,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * particular entity.
    */
   // NOLINTNEXTLINE(readability-identifier-naming)
-  std::vector<std::variant<BatchElementError, EntityReference>> register_(
+  std::vector<std::variant<errors::BatchElementError, EntityReference>> register_(
       const EntityReferences& entityReferences, const trait::TraitsDatas& entityTraitsDatas,
       access::PublishingAccess publishingAccess, const ContextConstPtr& context,
       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);

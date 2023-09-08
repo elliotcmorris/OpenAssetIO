@@ -13,6 +13,7 @@
 
 namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
+namespace errors {
 /**
  * @name Batch element errors
  *
@@ -155,5 +156,6 @@ static_assert(std::is_move_assignable_v<BatchElementError>);
 /**
  * @}
  */
+}  // namespace errors
 }  // namespace OPENASSETIO_CORE_ABI_VERSION
 }  // namespace openassetio

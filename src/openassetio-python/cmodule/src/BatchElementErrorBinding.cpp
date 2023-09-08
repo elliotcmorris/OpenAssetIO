@@ -12,7 +12,7 @@
 #include "_openassetio.hpp"
 
 void registerBatchElementError(py::module &mod) {
-  using openassetio::BatchElementError;
+  using openassetio::errors::BatchElementError;
 
   py::class_<BatchElementError> batchElementError{mod, "BatchElementError", py::is_final()};
 

@@ -579,7 +579,7 @@ class OPENASSETIO_CORE_EXPORT ManagerInterface {
    * @see @fqref{BatchElementError.ErrorCode} "ErrorCode" for
    * appropriate error codes.
    */
-  using BatchElementErrorCallback = std::function<void(std::size_t, BatchElementError)>;
+  using BatchElementErrorCallback = std::function<void(std::size_t, errors::BatchElementError)>;
   /**
    * @}
    */
