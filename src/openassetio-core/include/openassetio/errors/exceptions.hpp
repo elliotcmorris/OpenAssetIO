@@ -24,10 +24,10 @@ inline namespace OPENASSETIO_CORE_ABI_VERSION {
  * catch-all exception type when attempting mitigative exception
  * handling.
  *
- * Batch error handling with @ref BatchElementError is not exceptional,
- * However, OpenAssetIO provides convenience wrappers around some batch
- * functions that makes them exceptional, therefore each @ref
- * BatchElementError also has a
+ * Batch error handling with @ref BatchElementError is not
+ * exceptional, However, OpenAssetIO provides convenience wrappers
+ * around some batch functions that makes them exceptional, therefore
+ * each @ref BatchElementError also has a
  * @ref BatchElementException twin, also found in this namespace.
  */
 namespace errors {
@@ -95,8 +95,8 @@ struct OPENASSETIO_CORE_EXPORT UnhandledException : OpenAssetIOException {
  */
 
 /**
- * Exception base that ties together a @ref BatchElementError and an
- * index.
+ * Exception base that ties together a @ref errors.BatchElementError and
+ * an index.
  *
  * When thrown from a function, indicates that a particular
  * element has caused an error. The specific element that has errored
@@ -119,7 +119,7 @@ struct OPENASSETIO_CORE_EXPORT BatchElementException : std::runtime_error {
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kUnknown
+ * @ref errors.BatchElementError.ErrorCode.kUnknown
  */
 struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
@@ -127,7 +127,7 @@ struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementExcept
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kInvalidEntityReference
+ * @ref errors.BatchElementError.ErrorCode.kInvalidEntityReference
  */
 struct OPENASSETIO_CORE_EXPORT InvalidEntityReferenceBatchElementException
     : BatchElementException {
@@ -136,7 +136,7 @@ struct OPENASSETIO_CORE_EXPORT InvalidEntityReferenceBatchElementException
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kMalformedEntityReference
+ * @ref errors.BatchElementError.ErrorCode.kMalformedEntityReference
  */
 struct OPENASSETIO_CORE_EXPORT MalformedEntityReferenceBatchElementException
     : BatchElementException {
@@ -145,7 +145,7 @@ struct OPENASSETIO_CORE_EXPORT MalformedEntityReferenceBatchElementException
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kEntityAccessError
+ * @ref errors.BatchElementError.ErrorCode.kEntityAccessError
  */
 struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
@@ -153,7 +153,7 @@ struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchEle
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kEntityResolutionError
+ * @ref errors.BatchElementError.ErrorCode.kEntityResolutionError
  */
 struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
@@ -161,7 +161,7 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException : Batc
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kInvalidPreflightHint
+ * @ref errors.BatchElementError.ErrorCode.kInvalidPreflightHint
  */
 struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;
@@ -169,7 +169,7 @@ struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException : Batch
 
 /**
  * Exception equivalent of
- * @ref BatchElementError.ErrorCode.kInvalidTraitSet
+ * @ref errors.BatchElementError.ErrorCode.kInvalidTraitSet
  */
 struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
   using BatchElementException::BatchElementException;

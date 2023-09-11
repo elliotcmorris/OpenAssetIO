@@ -419,16 +419,16 @@ class OPENASSETIO_CORE_EXPORT Manager final {
     /**
      * Variant policy overloads, when used in a batch context, will be
      * exhaustive for all elements in the batch, a variant result
-     * containing either a @ref TraitsData or @ref BatchElementError
-     * will be provided for each @ref EntityReference provided as an
-     * argument to the operation.
+     * containing either a @ref TraitsData or @ref
+     * errors.BatchElementError will be provided for each @ref
+     * EntityReference provided as an argument to the operation.
      */
     struct Variant {};
     /**
-     * Exception policy overloads, when used in a batch context, will emit
-     * an exception at the first encountered @ref BatchElementError
-     * provided by the @ref ManagerInterface. This exception may not be in
-     * index order.
+     * Exception policy overloads, when used in a batch context, will
+     * emit an exception at the first encountered @ref
+     * errors.BatchElementError provided by the @ref ManagerInterface.
+     * This exception may not be in index order.
      */
     struct Exception {};
 
@@ -453,7 +453,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * whole-batch error.
    *
    * The appropriate error code should be used for these errors. See
-   * @fqref{BatchElementError.ErrorCode} "ErrorCode".
+   * @fqref{errors.BatchElementError.ErrorCode} "ErrorCode".
    */
   using BatchElementErrorCallback = std::function<void(std::size_t, errors::BatchElementError)>;
   /**
@@ -591,8 +591,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each
    * failed check of an entity reference. It will be given the
    * corresponding index of the entity reference in @p entityReferences
-   * along with a populated @fqref{BatchElementError}
-   * "BatchElementError" (see @fqref{BatchElementError.ErrorCode}
+   * along with a populated @fqref{errors.BatchElementError}
+   * "BatchElementError" (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `entityExists`.
    */
@@ -655,14 +655,14 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    *  Consult the originating project of the trait for more information.
    *
    * There may be errors during resolution. These can either be
-   * exceptions thrown from `resolve`, or @fqref{BatchElementError}
-   * "BatchElementError"s given to the `errorCallback`. Exceptions are
-   * unexpected errors that fail the whole batch. `BatchElementError`s
-   * are errors that are specific to a particular entity - other
-   * entities may still resolve successfully. Using HTTP status codes as
-   * an analogy, typically a server error (5xx) would correspond to an
-   * exception whereas a client error (4xx) would correspond to a
-   * `BatchElementError`.
+   * exceptions thrown from `resolve`, or
+   * @fqref{errors.BatchElementError} "BatchElementError"s given to the
+   * `errorCallback`. Exceptions are unexpected errors that fail the
+   * whole batch. `BatchElementError`s are errors that are specific to a
+   * particular entity - other entities may still resolve successfully.
+   * Using HTTP status codes as an analogy, typically a server error
+   * (5xx) would correspond to an exception whereas a client error (4xx)
+   * would correspond to a `BatchElementError`.
    *
    * This call will block until all resolutions are complete and
    * callbacks have been called. Callbacks will be called on the
@@ -687,8 +687,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each
    * failed resolution of an entity reference. It will be given the
    * corresponding index of the entity reference in @p entityReferences
-   * along with a populated @fqref{BatchElementError}
-   * "BatchElementError" (see @fqref{BatchElementError.ErrorCode}
+   * along with a populated @fqref{errors.BatchElementError}
+   * "BatchElementError" (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `resolve`.
    */
@@ -711,7 +711,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    *
    * Errors that occur during resolution will be thrown as an exception,
    * either from the @ref manager plugin (for errors not specific to the
-   * entity reference) or as a @fqref{BatchElementException}
+   * entity reference) or as a @fqref{errors.BatchElementException}
    * "BatchElementException"-derived error.
    *
    * @param entityReference Entity reference to query.
@@ -736,7 +736,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
 
   /**
    * Provides either a populated @fqref{TraitsData} "TraitsData" or a
-   * @fqref{BatchElementError} "BatchElementError".
+   * @fqref{errors.BatchElementError} "BatchElementError".
    *
    * If successful, the result is populated with the
    * available data for the requested set of traits for the given @ref
@@ -792,8 +792,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * Any errors that occur during resolution will be immediately thrown
    * as an exception, either from the @ref manager plugin (for errors
    * not specific to the entity reference) or as a
-   * @fqref{BatchElementException} "BatchElementException"-derived
-   * error.
+   * @fqref{errors.BatchElementException}
+   * "BatchElementException"-derived error.
    *
    * @param entityReferences Entity references to query.
    *
@@ -818,8 +818,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
 
   /**
    * Provides either a populated @fqref{TraitsData} "TraitsData" or a
-   * @fqref{BatchElementError} "BatchElementError" for each given @ref
-   * entity_reference.
+   * @fqref{errors.BatchElementError} "BatchElementError" for each given
+   * @ref entity_reference.
    *
    * For successful references, the corresponding element of the result
    * is populated with the available data for the requested set of
@@ -896,14 +896,16 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each failure
    * to retrieve a sensible default entity reference. It will be given
    * the corresponding index for each of the given sets in @p traitSets
-   * along with a populated @fqref{BatchElementError}
-   * "BatchElementError" (see @fqref{BatchElementError.ErrorCode}
-   * "ErrorCodes"). The @fqref{BatchElementError.ErrorCode.kEntityAccessError}
+   * along with a populated @fqref{errors.BatchElementError}
+   * "BatchElementError" (see @fqref{errors.BatchElementError.ErrorCode}
+   * "ErrorCodes"). The
+   * @fqref{errors.BatchElementError.ErrorCode.kEntityAccessError}
    * "kEntityAccessError" error will be used if no suitable default
-   * reference exists, and the @fqref{BatchElementError.ErrorCode.kInvalidTraitSet}
-   * "kInvalidTraitSet" error used if the requested trait set is
-   * not recognised by the manager. The callback will be called on the
-   * same thread that initiated the call to `defaultEntityReference`.
+   * reference exists, and the
+   * @fqref{errors.BatchElementError.ErrorCode.kInvalidTraitSet}
+   * "kInvalidTraitSet" error used if the requested trait set is not
+   * recognised by the manager. The callback will be called on the same
+   * thread that initiated the call to `defaultEntityReference`.
    */
   void defaultEntityReference(const trait::TraitSets& traitSets,
                               access::DefaultEntityAccess defaultEntityAccess,
@@ -999,7 +1001,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each failed
    * relationship query. It will be given the corresponding index of the
    * entity reference in @p entityReferences along with a populated
-   * BatchElementError (see @ref BatchElementError.ErrorCode
+   * BatchElementError (see @ref errors.BatchElementError.ErrorCode
    * "ErrorCodes"). The callback will be called on the same thread that
    * initiated the call to `getWithRelationship`.
    *
@@ -1055,7 +1057,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each failed
    * relationship query. It will be given the corresponding index of the
    * relationship in @p relationshipTraitsDatas along with a populated
-   * BatchElementError (see @fqref{BatchElementError.ErrorCode}
+   * BatchElementError (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread that
    * initiated the call to `getWithRelationships`.
    *
@@ -1114,7 +1116,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each failed
    * relationship query. It will be given the corresponding index of the
    * entity reference in @p entityReferences along with a populated
-   * BatchElementError (see @ref BatchElementError.ErrorCode
+   * BatchElementError (see @ref errors.BatchElementError.ErrorCode
    * "ErrorCodes"). The callback will be called on the same thread that
    * initiated the call to `getWithRelationshipPaged`.
    *
@@ -1164,7 +1166,7 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each failed
    * relationship query. It will be given the corresponding index of the
    * relationship in @p relationshipTraitsDatas along with a populated
-   * BatchElementError (see @fqref{BatchElementError.ErrorCode}
+   * BatchElementError (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread that
    * initiated the call to `getWithRelationshipsPaged`.
    *
@@ -1234,8 +1236,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * traits, please see @ref entities_traits_and_specifications "this"
    * page.
    *
-   * The action of 'publishing' itself, is split into two parts, depending on
-   * the nature of the item to be published.
+   * The action of 'publishing' itself, is split into two parts,
+   * depending on the nature of the item to be published.
    *
    *  @li **Preflight** When you are about to create some new
    *  media/asset.
@@ -1328,8 +1330,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each
    * failed preflight of an entity reference. It will be given the
    * corresponding index of the entity reference in @p entityReferences
-   * along with a populated @fqref{BatchElementError}
-   * "BatchElementError" (see @fqref{BatchElementError.ErrorCode}
+   * along with a populated @fqref{errors.BatchElementError}
+   * "BatchElementError" (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `preflight`.
    *
@@ -1355,8 +1357,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * Any errors that occur during the preflight call will be immediately
    * thrown as an exception, either from the @ref manager plugin (for
    * errors not specific to the entity reference) or as a
-   * @fqref{BatchElementException} "BatchElementException"-derived
-   * error.
+   * @fqref{errors.BatchElementException}
+   * "BatchElementException"-derived error.
    *
    * @param entityReference The entity reference to preflight prior
    * to registration.
@@ -1447,8 +1449,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * Any errors that occur during the preflight call will be immediately
    * thrown as an exception, either from the @ref manager plugin (for
    * errors not specific to an entity reference) or as a
-   * @fqref{BatchElementException} "BatchElementException"-derived
-   * error.
+   * @fqref{errors.BatchElementException}
+   * "BatchElementException"-derived error.
    *
    * @param entityReferences The entity references to preflight prior
    * to registration.
@@ -1611,8 +1613,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * @param errorCallback Callback that will be called for each
    * failed registration of an entity reference. It will be given the
    * corresponding index of the entity reference in @p entityReferences
-   * along with a populated @fqref{BatchElementError}
-   * "BatchElementError" (see @fqref{BatchElementError.ErrorCode}
+   * along with a populated @fqref{errors.BatchElementError}
+   * "BatchElementError" (see @fqref{errors.BatchElementError.ErrorCode}
    * "ErrorCodes"). The callback will be called on the same thread
    * that initiated the call to `register`.
    *
@@ -1649,8 +1651,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * Any errors that occur during the register_ call will be immediately
    * thrown as an exception, either from the @ref manager plugin (for
    * errors not specific to the entity reference) or as a
-   * @fqref{BatchElementException} "BatchElementException"-derived
-   * error.
+   * @fqref{errors.BatchElementException}
+   * "BatchElementException"-derived error.
    *
    * @param entityReference Entity reference to register to.
    *
@@ -1740,8 +1742,8 @@ class OPENASSETIO_CORE_EXPORT Manager final {
    * Any errors that occur during the register_ call will be immediately
    * thrown as an exception, either from the @ref manager plugin (for
    * errors not specific to the entity reference) or as a
-   * @fqref{BatchElementException} "BatchElementException"-derived
-   * error.
+   * @fqref{errors.BatchElementException}
+   * "BatchElementException"-derived error.
    *
    * @param entityReferences Entity references to register to.
    *
