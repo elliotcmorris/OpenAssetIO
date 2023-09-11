@@ -47,3 +47,6 @@
 
 /// Failure due to a TraitSet being unknown to the manager
 #define OPENASSETIO_BatchErrorCode_kInvalidTraitSet (OPENASSETIO_BatchErrorCode_BEGIN + 6)
+
+// Failure due to a TraitsData being invalid
+#define OPENASSETIO_BatchErrorCode_kInvalidTraitsData (OPENASSETIO_BatchErrorCode_BEGIN + 7)

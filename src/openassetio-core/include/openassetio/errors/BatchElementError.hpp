@@ -111,6 +111,12 @@ class BatchElementError final {
     kEntityResolutionError = OPENASSETIO_BatchErrorCode_kEntityResolutionError,
 
     /**
+     * Error code used whenever the contents of a traitsdata is unknown
+     * or unsupported by the manager.
+     */
+    kInvalidTraitsData = OPENASSETIO_BatchErrorCode_kInvalidTraitsData,
+
+    /**
      * Error code response from @ref glossary_preflight if the provided
      * @fqref{TraitsData} "traits data" hint holds insufficient or
      * invalid information.

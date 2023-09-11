@@ -7,7 +7,10 @@
 #include <utility>
 
 #include <openassetio/export.h>
+#include <openassetio/EntityReference.hpp>
+#include <openassetio/TraitsData.hpp>
 #include <openassetio/errors/BatchElementError.hpp>
+#include <openassetio/trait/collection.hpp>
 #include <openassetio/typedefs.hpp>
 
 namespace openassetio {
@@ -126,12 +129,26 @@ struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementExcept
 };
 
 /**
+ * Intermediate base for BatchElementExceptions where the batch axis
+ * is along entity references,
+ *
+ * These errors are therefore capable of providing the individual @ref
+ * EntityReference in the batch that caused the failure.
+ */
+struct OPENASSETIO_CORE_EXPORT BatchElementEntityReferenceException : BatchElementException {
+  BatchElementEntityReferenceException(std::size_t idx, BatchElementError err,
+                                       EntityReference entityRef)
+      : BatchElementException(idx, std::move(err)), entityReference{std::move(entityRef)} {}
+  EntityReference entityReference;
+};
+
+/**
  * Exception equivalent of
  * @ref errors.BatchElementError.ErrorCode.kInvalidEntityReference
  */
 struct OPENASSETIO_CORE_EXPORT InvalidEntityReferenceBatchElementException
-    : BatchElementException {
-  using BatchElementException::BatchElementException;
+    : BatchElementEntityReferenceException {
+  using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
 };
 
 /**
@@ -139,32 +156,54 @@ struct OPENASSETIO_CORE_EXPORT InvalidEntityReferenceBatchElementException
  * @ref errors.BatchElementError.ErrorCode.kMalformedEntityReference
  */
 struct OPENASSETIO_CORE_EXPORT MalformedEntityReferenceBatchElementException
-    : BatchElementException {
-  using BatchElementException::BatchElementException;
+    : BatchElementEntityReferenceException {
+  using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
 };
 
 /**
  * Exception equivalent of
  * @ref errors.BatchElementError.ErrorCode.kEntityAccessError
  */
-struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
-  using BatchElementException::BatchElementException;
+struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException
+    : BatchElementEntityReferenceException {
+  using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
 };
 
 /**
  * Exception equivalent of
  * @ref errors.BatchElementError.ErrorCode.kEntityResolutionError
  */
-struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException : BatchElementException {
-  using BatchElementException::BatchElementException;
+struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
+    : BatchElementEntityReferenceException {
+  using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
+};
+
+/**
+ *  Exception equivalent of
+ * @ref errors.BatchElementError.ErrorCode.InvalidTraitsData
+ *
+ * Although the batch axis is along TraitsData and not  @ref
+ * EntityReference, these errors may optionally be able to provide a
+ * contextual @ref EntityReference.
+ */
+struct InvalidTraitsDataBatchElementException : BatchElementException {
+  InvalidTraitsDataBatchElementException(std::size_t idx, BatchElementError err,
+                                         TraitsDataPtr _traitsData,
+                                         std::optional<EntityReference> entityRef)
+      : BatchElementException(idx, std::move(err)),
+        traitsData{std::move(_traitsData)},
+        entityReference{std::move(entityRef)} {}
+  TraitsDataPtr traitsData;
+  std::optional<EntityReference> entityReference;
 };
 
 /**
  * Exception equivalent of
  * @ref errors.BatchElementError.ErrorCode.kInvalidPreflightHint
  */
-struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException : BatchElementException {
-  using BatchElementException::BatchElementException;
+struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException
+    : InvalidTraitsDataBatchElementException {
+  using InvalidTraitsDataBatchElementException::InvalidTraitsDataBatchElementException;
 };
 
 /**
@@ -172,7 +211,14 @@ struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException : Batch
  * @ref errors.BatchElementError.ErrorCode.kInvalidTraitSet
  */
 struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
-  using BatchElementException::BatchElementException;
+  InvalidTraitSetBatchElementException(std::size_t idx, BatchElementError err,
+                                       trait::TraitSet _traitSet,
+                                       std::optional<EntityReference> entityRef)
+      : BatchElementException(idx, std::move(err)),
+        traitSet{std::move(_traitSet)},
+        entityReference{std::move(entityRef)} {}
+  trait::TraitSet traitSet;
+  std::optional<EntityReference> entityReference;
 };
 
 /**
