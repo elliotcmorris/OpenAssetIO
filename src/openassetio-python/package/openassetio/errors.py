@@ -20,7 +20,6 @@ Provides exception objects to facilitate error handling in OpenAssetIO
 
 from . import _openassetio  # pylint: disable=no-name-in-module
 
-
 OpenAssetIOException = _openassetio.errors.OpenAssetIOException
 InputValidationException = _openassetio.errors.InputValidationException
 ConfigurationException = _openassetio.errors.ConfigurationException
@@ -29,18 +28,13 @@ UnhandledException = _openassetio.errors.UnhandledException
 BatchElementError = _openassetio.errors.BatchElementError
 BatchElementException = _openassetio.errors.BatchElementException
 UnknownBatchElementException = _openassetio.errors.UnknownBatchElementException
-InvalidEntityReferenceBatchElementException = (
-    _openassetio.errors.InvalidEntityReferenceBatchElementException
-)
-
-MalformedEntityReferenceBatchElementException = (
-    _openassetio.errors.MalformedEntityReferenceBatchElementException
-)
-EntityAccessErrorBatchElementException = _openassetio.errors.EntityAccessErrorBatchElementException
-EntityResolutionErrorBatchElementException = (
-    _openassetio.errors.EntityResolutionErrorBatchElementException
-)
-InvalidPreflightHintBatchElementException = (
-    _openassetio.errors.InvalidPreflightHintBatchElementException
-)
 InvalidTraitSetBatchElementException = _openassetio.errors.InvalidTraitSetBatchElementException
+EntityAccessErrorBatchElementException = _openassetio.errors.EntityAccessErrorBatchElementException
+# Black will format these long ones as a multiline scope, which doxygen
+# mistakes as a tuple.
+# fmt: off
+InvalidEntityReferenceBatchElementException = _openassetio.errors.InvalidEntityReferenceBatchElementException
+MalformedEntityReferenceBatchElementException = _openassetio.errors.MalformedEntityReferenceBatchElementException
+EntityResolutionErrorBatchElementException = _openassetio.errors.EntityResolutionErrorBatchElementException
+InvalidPreflightHintBatchElementException = _openassetio.errors.InvalidPreflightHintBatchElementException
+# fmt: on
