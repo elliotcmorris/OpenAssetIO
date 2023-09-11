@@ -12,10 +12,28 @@
 
 namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
+/**
+ * This namespace contains types related to error handling.
+ *
+ * Generally there are two types of error handling, "standard" non-batch
+ * error handling, which is exception based, and batch errors, which are
+ * based upon the @ref BatchElementError type.
+ *
+ * All exceptions in OpenAssetIO are derived from the @ref
+ * OpenAssetIOException type, the idea being a host can use this as a
+ * catch-all exception type when attempting mitigative exception
+ * handling.
+ *
+ * Batch error handling with @ref BatchElementError is not exceptional,
+ * However, OpenAssetIO provides convenience wrappers around some batch
+ * functions that makes them exceptional, therefore each @ref
+ * BatchElementError also has a
+ * @ref BatchElementException twin, also found in this namespace.
+ */
 namespace errors {
+
 /**
  * @name OpenassetIO Exceptions
- *
  * @{
  */
 
@@ -48,7 +66,7 @@ struct OPENASSETIO_CORE_EXPORT ConfigurationException : InputValidationException
   using InputValidationException::InputValidationException;
 };
 
-/**
+/*
  * Thrown whenever a procedure must abort due to not being implemented.
  * Many methods in OpenAssetIO are optionally implementable, and some
  * may throw this exception to indicate that calling them constitutes
