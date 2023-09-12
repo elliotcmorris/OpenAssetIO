@@ -186,7 +186,7 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
  * EntityReference, these errors may optionally be able to provide a
  * contextual @ref EntityReference.
  */
-struct InvalidTraitsDataBatchElementException : BatchElementException {
+struct OPENASSETIO_CORE_EXPORT InvalidTraitsDataBatchElementException : BatchElementException {
   InvalidTraitsDataBatchElementException(std::size_t idx, BatchElementError err,
                                          std::optional<TraitsDataPtr> _traitsData,
                                          std::optional<EntityReference> entityRef)

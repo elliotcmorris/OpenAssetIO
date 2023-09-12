@@ -27,14 +27,20 @@ NotImplementedException = _openassetio.errors.NotImplementedException
 UnhandledException = _openassetio.errors.UnhandledException
 BatchElementError = _openassetio.errors.BatchElementError
 BatchElementException = _openassetio.errors.BatchElementException
+BatchElementEntityReferenceException = _openassetio.errors.BatchElementEntityReferenceException
 UnknownBatchElementException = _openassetio.errors.UnknownBatchElementException
 InvalidTraitSetBatchElementException = _openassetio.errors.InvalidTraitSetBatchElementException
+InvalidTraitsDataBatchElementException = _openassetio.errors.InvalidTraitsDataBatchElementException
 EntityAccessErrorBatchElementException = _openassetio.errors.EntityAccessErrorBatchElementException
 # Black will format these long ones as a multiline scope, which doxygen
 # mistakes as a tuple.
 # fmt: off
-InvalidEntityReferenceBatchElementException = _openassetio.errors.InvalidEntityReferenceBatchElementException
-MalformedEntityReferenceBatchElementException = _openassetio.errors.MalformedEntityReferenceBatchElementException
-EntityResolutionErrorBatchElementException = _openassetio.errors.EntityResolutionErrorBatchElementException
-InvalidPreflightHintBatchElementException = _openassetio.errors.InvalidPreflightHintBatchElementException
+InvalidEntityReferenceBatchElementException = \
+  _openassetio.errors.InvalidEntityReferenceBatchElementException
+MalformedEntityReferenceBatchElementException = \
+  _openassetio.errors.MalformedEntityReferenceBatchElementException
+EntityResolutionErrorBatchElementException = \
+  _openassetio.errors.EntityResolutionErrorBatchElementException
+InvalidPreflightHintBatchElementException = \
+  _openassetio.errors.InvalidPreflightHintBatchElementException
 # fmt: on

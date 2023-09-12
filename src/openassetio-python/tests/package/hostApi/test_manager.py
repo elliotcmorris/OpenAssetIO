@@ -40,6 +40,7 @@ from openassetio.errors import (
     EntityResolutionErrorBatchElementException,
     InvalidPreflightHintBatchElementException,
     InvalidTraitSetBatchElementException,
+    InvalidTraitsDataBatchElementException,
     BatchElementError,
     InputValidationException,
 )
@@ -1117,6 +1118,7 @@ batch_element_exceptions = [
     EntityResolutionErrorBatchElementException,
     InvalidPreflightHintBatchElementException,
     InvalidTraitSetBatchElementException,
+    InvalidTraitsDataBatchElementException,
 ]
 
 batch_element_error_code_exception_pairs = list(

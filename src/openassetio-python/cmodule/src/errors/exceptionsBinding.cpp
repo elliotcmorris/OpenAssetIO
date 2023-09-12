@@ -96,8 +96,9 @@ void registerBatchElementExceptions(const py::module &mod) {
   // and use it as the base class for pybind's limited exception
   // registration API.
 
+  // Make sure OpenAssetIOException has already been registered!
   py::exec(R"pybind(
-class BatchElementException(RuntimeError):
+class BatchElementException(OpenAssetIOException):
     def __init__(self, index: int, error):
         self.index = index
         self.error = error
@@ -108,11 +109,13 @@ class BatchElementException(RuntimeError):
   // the string literal above.
   const py::object pyBatchElementException = mod.attr("BatchElementException");
 
+  using openassetio::errors::BatchElementEntityReferenceException;
   using openassetio::errors::BatchElementException;
   using openassetio::errors::EntityAccessErrorBatchElementException;
   using openassetio::errors::EntityResolutionErrorBatchElementException;
   using openassetio::errors::InvalidEntityReferenceBatchElementException;
   using openassetio::errors::InvalidPreflightHintBatchElementException;
+  using openassetio::errors::InvalidTraitsDataBatchElementException;
   using openassetio::errors::InvalidTraitSetBatchElementException;
   using openassetio::errors::MalformedEntityReferenceBatchElementException;
   using openassetio::errors::UnknownBatchElementException;
@@ -121,18 +124,34 @@ class BatchElementException(RuntimeError):
   // class created above. Note that this is not sufficient to cause C++
   // exceptions to be translated. See `register_exception_translator`
   // below.
-  const auto registerPyException = [&mod, &pyBatchElementException](const char *pyTypeName) {
-    py::exception<void /* unused */>{mod, pyTypeName, pyBatchElementException};
+  const auto registerPyException = [&mod](const char *pyTypeName, const py::object &baseType) {
+    return py::exception<void /* unused */>{mod, pyTypeName, baseType};
   };
 
   // Register each of our BatchElement exception types.
-  registerPyException("UnknownBatchElementException");
-  registerPyException("InvalidEntityReferenceBatchElementException");
-  registerPyException("MalformedEntityReferenceBatchElementException");
-  registerPyException("EntityAccessErrorBatchElementException");
-  registerPyException("EntityResolutionErrorBatchElementException");
-  registerPyException("InvalidPreflightHintBatchElementException");
-  registerPyException("InvalidTraitSetBatchElementException");
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("UnknownBatchElementException", pyBatchElementException);
+  auto pyBatchElementEntityReferenceException =
+      registerPyException("BatchElementEntityReferenceException", pyBatchElementException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("InvalidEntityReferenceBatchElementException",
+                      pyBatchElementEntityReferenceException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("MalformedEntityReferenceBatchElementException",
+                      pyBatchElementEntityReferenceException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("EntityAccessErrorBatchElementException",
+                      pyBatchElementEntityReferenceException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("EntityResolutionErrorBatchElementException",
+                      pyBatchElementEntityReferenceException);
+  auto pyInvalidTraitsDataBatchElementException =
+      registerPyException("InvalidTraitsDataBatchElementException", pyBatchElementException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("InvalidPreflightHintBatchElementException",
+                      pyInvalidTraitsDataBatchElementException);
+  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
+  registerPyException("InvalidTraitSetBatchElementException", pyBatchElementException);
 
   // Register a function that will translate our C++ exceptions to the
   // appropriate Python exception type.
@@ -172,6 +191,10 @@ class BatchElementException(RuntimeError):
       setPyException("InvalidPreflightHintBatchElementException", exc);
     } catch (const InvalidTraitSetBatchElementException &exc) {
       setPyException("InvalidTraitSetBatchElementException", exc);
+    } catch (const InvalidTraitsDataBatchElementException &exc) {
+      setPyException("InvalidTraitsDataBatchElementException", exc);
+    } catch (const BatchElementEntityReferenceException &exc) {
+      setPyException("BatchElementEntityReferenceException", exc);
     } catch (const BatchElementException &exc) {
       setPyException("BatchElementException", exc);
     }
@@ -181,7 +204,7 @@ class BatchElementException(RuntimeError):
 
 void registerExceptions(const py::module &mod) {
   registerNonBatchExceptions(mod);
-  // Make sure the non batch exception is registered first, as that
+  // Make SURE the non batch exception is registered first, as that
   // includes the shared base exception.
   registerBatchElementExceptions(mod);
 }
