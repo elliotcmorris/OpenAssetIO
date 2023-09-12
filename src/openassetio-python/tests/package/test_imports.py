@@ -134,6 +134,36 @@ class Test_errors_imports:
     def test_importing_UnhandledException_succeeds(self):
         from openassetio.errors import UnhandledException
 
+    def test_importing_BatchElementException_succeeds(self):
+        from openassetio.errors import BatchElementException
+
+    def test_importing_UnknownBatchElementException_succeeds(self):
+        from openassetio.errors import UnknownBatchElementException
+
+    def test_importing_BatchElementEntityReferenceException_succeeds(self):
+        from openassetio.errors import BatchElementEntityReferenceException
+
+    def test_importing_InvalidEntityReferenceBatchElementException_succeeds(self):
+        from openassetio.errors import InvalidEntityReferenceBatchElementException
+
+    def test_importing_EntityAccessErrorBatchElementException_succeeds(self):
+        from openassetio.errors import EntityAccessErrorBatchElementException
+
+    def test_importing_EntityResolutionErrorBatchElementException_succeeds(self):
+        from openassetio.errors import EntityResolutionErrorBatchElementException
+
+    def test_importing_InvalidTraitsDataBatchElementException_succeeds(self):
+        from openassetio.errors import InvalidTraitsDataBatchElementException
+
+    def test_importing_InvalidPreflightHintBatchElementException_succeeds(self):
+        from openassetio.errors import InvalidPreflightHintBatchElementException
+
+    def test_importing_InvalidTraitSetBatchElementException_succeeds(self):
+        from openassetio.errors import InvalidTraitSetBatchElementException
+
+    def test_importing_MalformedEntityReferenceBatchElementException_succeeds(self):
+        from openassetio.errors import MalformedEntityReferenceBatchElementException
+
 
 class Test_test_imports:
     def test_importing_manager_succeeds(self):

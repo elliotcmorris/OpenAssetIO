@@ -28,42 +28,64 @@ from openassetio import _openassetio_test  # pylint: disable=no-name-in-module
 from openassetio import errors
 
 
+allExceptionTypes = (
+    errors.OpenAssetIOException,
+    errors.InputValidationException,
+    errors.ConfigurationException,
+    errors.NotImplementedException,
+    errors.UnhandledException,
+    errors.BatchElementException,
+    errors.BatchElementEntityReferenceException,
+    errors.UnknownBatchElementException,
+    errors.InvalidTraitSetBatchElementException,
+    errors.InvalidTraitsDataBatchElementException,
+    errors.EntityAccessErrorBatchElementException,
+    errors.InvalidEntityReferenceBatchElementException,
+    errors.MalformedEntityReferenceBatchElementException,
+    errors.EntityResolutionErrorBatchElementException,
+    errors.InvalidPreflightHintBatchElementException,
+)
+
+batchElementExceptions = (
+    errors.BatchElementException,
+    errors.BatchElementEntityReferenceException,
+    errors.UnknownBatchElementException,
+    errors.InvalidTraitSetBatchElementException,
+    errors.InvalidTraitsDataBatchElementException,
+    errors.EntityAccessErrorBatchElementException,
+    errors.InvalidEntityReferenceBatchElementException,
+    errors.MalformedEntityReferenceBatchElementException,
+    errors.EntityResolutionErrorBatchElementException,
+    errors.InvalidPreflightHintBatchElementException,
+)
+
+entityReferenceExceptions = (
+    errors.EntityAccessErrorBatchElementException,
+    errors.InvalidEntityReferenceBatchElementException,
+    errors.MalformedEntityReferenceBatchElementException,
+    errors.EntityResolutionErrorBatchElementException,
+)
+
+
 class Test_errors:
-    def test_when_cpp_exception_thrown_then_can_be_caught_as_corresponding_python_exception(self):
-        exceptions = (
-            errors.OpenAssetIOException,
-            errors.ConfigurationException,
-            errors.InputValidationException,
-            errors.NotImplementedException,
-            errors.UnhandledException,
-        )
+    @pytest.mark.parametrize("exceptionType", allExceptionTypes)
+    def test_when_cpp_exception_thrown_then_can_be_caught_as_corresponding_python_exception(
+        self, exceptionType
+    ):
+        with pytest.raises(exceptionType, match="Explosion!"):
+            _openassetio_test.throwExceptionWithPopulatedArgs(exceptionType.__name__)
 
-        for exception in exceptions:
-            with pytest.raises(exception, match="Explosion!"):
-                _openassetio_test.throwException(exception.__name__, "Explosion!")
-
-    def test_when_cpp_exception_thrown_then_can_be_caught_as_OpenAssetIOException(self):
-        exceptions = (
-            errors.ConfigurationException,
-            errors.InputValidationException,
-            errors.NotImplementedException,
-            errors.UnhandledException,
-        )
-
-        for exception in exceptions:
-            assert _openassetio_test.isThrownExceptionCatchableAs(
-                throwExceptionName=exception.__name__,
-                catchExceptionName=errors.OpenAssetIOException.__name__,
-            )
-            with pytest.raises(errors.OpenAssetIOException, match="Explosion!"):
-                _openassetio_test.throwException(exception.__name__, "Explosion!")
+    @pytest.mark.parametrize("exceptionType", allExceptionTypes)
+    def test_when_cpp_exception_thrown_then_can_be_caught_as_OpenAssetIOException(
+        self, exceptionType
+    ):
+        with pytest.raises(errors.OpenAssetIOException, match="Explosion!"):
+            _openassetio_test.throwExceptionWithPopulatedArgs(exceptionType.__name__)
 
     def test_when_ConfigurationException_thrown_then_can_be_caught_as_InputValidationException(
         self,
     ):
-        assert _openassetio_test.isThrownExceptionCatchableAs(
-            throwExceptionName=errors.ConfigurationException.__name__,
-            catchExceptionName=errors.InputValidationException.__name__,
-        )
         with pytest.raises(errors.InputValidationException, match="Explosion!"):
-            _openassetio_test.throwException(errors.ConfigurationException.__name__, "Explosion!")
+            _openassetio_test.throwExceptionWithPopulatedArgs(
+                errors.ConfigurationException.__name__
+            )
