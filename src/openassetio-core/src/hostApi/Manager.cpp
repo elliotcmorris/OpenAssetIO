@@ -19,46 +19,57 @@
 namespace openassetio {
 inline namespace OPENASSETIO_CORE_ABI_VERSION {
 namespace {
+
+/*
+ * A type containing all the data that may need to go into any
+ * BatchElementException. Used in the conveniences to attempt to
+ * populate any known data when converting from BatchElementError to
+ * BatchElementException.
+ *
+ * All optional. The conveniences pack this struct with all they can
+ * at point of call, and then we construct the exceptions best we can,
+ * knowing that if a manager has emitted an "innapropriate"
+ * BatchElementError all the data may not be able to be provided.
+ */
+struct BatchElementExceptionData {
+  std::optional<EntityReference> entityRef = {};
+  std::optional<TraitsDataPtr> traitsData = {};
+  std::optional<trait::TraitSet> traitSet = {};
+};
+
 // Takes a BatchElementError and throws an equivalent exception.
 // Our exception types generally expect either an entityReference or
 // a traitsDataPtr and an optional entityReference. Defer to the type
 // in the error then access expected values.
 void throwFromBatchElementError(std::size_t index, errors::BatchElementError error,
-                                std::optional<TraitsDataPtr> optionalTraitsData,
-                                std::optional<EntityReference> optionalEntityRef,
-                                std::optional<openassetio::trait::TraitSet> optionalTraitSet) {
+                                BatchElementExceptionData exceptionData = {}) {
   switch (error.code) {
     case errors::BatchElementError::ErrorCode::kUnknown:
       throw errors::UnknownBatchElementException(index, std::move(error));
     case errors::BatchElementError::ErrorCode::kInvalidEntityReference:
-      assert(optionalEntityRef.has_value());
       throw errors::InvalidEntityReferenceBatchElementException(
-          index, std::move(error), std::move(optionalEntityRef.value()));
+          index, std::move(error), std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kMalformedEntityReference:
-      assert(optionalEntityRef.has_value());
       throw errors::MalformedEntityReferenceBatchElementException(
-          index, std::move(error), std::move(optionalEntityRef.value()));
+          index, std::move(error), std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kEntityAccessError:
-      assert(optionalEntityRef.has_value());
       throw errors::EntityAccessErrorBatchElementException(index, std::move(error),
-                                                           std::move(optionalEntityRef.value()));
+                                                           std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kEntityResolutionError:
-      assert(optionalEntityRef.has_value());
-      throw errors::EntityResolutionErrorBatchElementException(
-          index, std::move(error), std::move(optionalEntityRef.value()));
+      throw errors::EntityResolutionErrorBatchElementException(index, std::move(error),
+                                                               std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kInvalidTraitsData:
-      assert(optionalTraitsData.has_value());
-      throw errors::InvalidTraitsDataBatchElementException(
-          index, std::move(error), optionalTraitsData.value(), std::move(optionalEntityRef));
+      throw errors::InvalidTraitsDataBatchElementException(index, std::move(error),
+                                                           std::move(exceptionData.traitsData),
+                                                           std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kInvalidPreflightHint:
-      assert(optionalTraitsData.has_value());
-      throw errors::InvalidPreflightHintBatchElementException(
-          index, std::move(error), optionalTraitsData.value(), std::move(optionalEntityRef));
+      throw errors::InvalidPreflightHintBatchElementException(index, std::move(error),
+                                                              std::move(exceptionData.traitsData),
+                                                              std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kInvalidTraitSet:
-      assert(optionalTraitSet.has_value());
       throw errors::InvalidTraitSetBatchElementException(index, std::move(error),
-                                                         std::move(optionalTraitSet.value()),
-                                                         std::move(optionalEntityRef));
+                                                         std::move(exceptionData.traitSet),
+                                                         std::move(exceptionData.entityRef));
     default:
       std::string exceptionMessage = "Invalid BatchElementError. Code: ";
       exceptionMessage += std::to_string(static_cast<int>(error.code));
@@ -221,7 +232,10 @@ TraitsDataPtr hostApi::Manager::resolve(
         resolveResult = std::move(data);
       },
       [&entityReference, &traitSet](std::size_t index, errors::BatchElementError error) {
-        throwFromBatchElementError(index, std::move(error), {}, entityReference, traitSet);
+        BatchElementExceptionData data;
+        data.entityRef = entityReference;
+        data.traitSet = traitSet;
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return resolveResult;
@@ -260,7 +274,10 @@ std::vector<TraitsDataPtr> hostApi::Manager::resolve(
       },
       [&entityReferences, &traitSet](std::size_t index, errors::BatchElementError error) {
         // Implemented as if FAILFAST is true.
-        throwFromBatchElementError(index, std::move(error), {}, entityReferences[index], traitSet);
+        BatchElementExceptionData data;
+        data.entityRef = entityReferences[index];
+        data.traitSet = traitSet;
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return resolveResult;
@@ -401,7 +418,10 @@ EntityReference Manager::preflight(
         result = std::move(preflightedRef);
       },
       [&entityReference, &traitsHint](std::size_t index, errors::BatchElementError error) {
-        throwFromBatchElementError(index, std::move(error), traitsHint, entityReference, {});
+        BatchElementExceptionData data;
+        data.entityRef = entityReference;
+        data.traitsData = traitsHint;
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return result;
@@ -437,9 +457,11 @@ EntityReferences Manager::preflight(
         results[index] = std::move(preflightedRef);
       },
       [&entityReferences, &traitsHints](std::size_t index, errors::BatchElementError error) {
+        BatchElementExceptionData data;
+        data.entityRef = entityReferences[index];
+        data.traitsData = traitsHints[index];
         // Implemented as if FAILFAST is true.
-        throwFromBatchElementError(index, std::move(error), traitsHints[index],
-                                   entityReferences[index], {});
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return results;
@@ -493,7 +515,10 @@ EntityReference hostApi::Manager::register_(
         result = std::move(registeredRef);
       },
       [&entityReference, &entityTraitsData](std::size_t index, errors::BatchElementError error) {
-        throwFromBatchElementError(index, std::move(error), entityTraitsData, entityReference, {});
+        BatchElementExceptionData data;
+        data.entityRef = entityReference;
+        data.traitsData = entityTraitsData;
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return result;
@@ -531,9 +556,11 @@ std::vector<EntityReference> hostApi::Manager::register_(
         result[index] = std::move(registeredRef);
       },
       [&entityReferences, &entityTraitsDatas](std::size_t index, errors::BatchElementError error) {
-        // Implemented as if FAILFAST is true.
-        throwFromBatchElementError(index, std::move(error), entityTraitsDatas[index],
-                                   entityReferences[index], {});
+        BatchElementExceptionData data;
+        data.entityRef = entityReferences[index];
+        data.traitsData = entityTraitsDatas[index];
+        // Implemented as if FAILFAST is true
+        throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
   return result;

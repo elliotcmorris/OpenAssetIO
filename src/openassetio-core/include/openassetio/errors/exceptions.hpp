@@ -137,9 +137,9 @@ struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementExcept
  */
 struct OPENASSETIO_CORE_EXPORT BatchElementEntityReferenceException : BatchElementException {
   BatchElementEntityReferenceException(std::size_t idx, BatchElementError err,
-                                       EntityReference entityRef)
+                                       std::optional<EntityReference> entityRef)
       : BatchElementException(idx, std::move(err)), entityReference{std::move(entityRef)} {}
-  EntityReference entityReference;
+  std::optional<EntityReference> entityReference;
 };
 
 /**
@@ -188,12 +188,12 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
  */
 struct InvalidTraitsDataBatchElementException : BatchElementException {
   InvalidTraitsDataBatchElementException(std::size_t idx, BatchElementError err,
-                                         TraitsDataPtr _traitsData,
+                                         std::optional<TraitsDataPtr> _traitsData,
                                          std::optional<EntityReference> entityRef)
-      : BatchElementException(idx, std::move(err)),
+      : BatchElementException{idx, std::move(err)},
         traitsData{std::move(_traitsData)},
         entityReference{std::move(entityRef)} {}
-  TraitsDataPtr traitsData;
+  std::optional<TraitsDataPtr> traitsData;
   std::optional<EntityReference> entityReference;
 };
 
@@ -212,12 +212,12 @@ struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException
  */
 struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
   InvalidTraitSetBatchElementException(std::size_t idx, BatchElementError err,
-                                       trait::TraitSet _traitSet,
+                                       std::optional<trait::TraitSet> _traitSet,
                                        std::optional<EntityReference> entityRef)
-      : BatchElementException(idx, std::move(err)),
+      : BatchElementException{idx, std::move(err)},
         traitSet{std::move(_traitSet)},
         entityReference{std::move(entityRef)} {}
-  trait::TraitSet traitSet;
+  std::optional<trait::TraitSet> traitSet;
   std::optional<EntityReference> entityReference;
 };
 

@@ -380,7 +380,7 @@ TEMPLATE_TEST_CASE(
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
                    resolve(refs, traits, resolveAccess, context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError));
+          .LR_SIDE_EFFECT(_7(1, expectedError));
 
       WHEN("resolve is called with kException errorPolicyTag") {
         THEN("an exception is thrown") {
@@ -391,7 +391,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }
@@ -409,7 +409,7 @@ TEMPLATE_TEST_CASE(
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
                    resolve(refs, traits, resolveAccess, context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError))
+          .LR_SIDE_EFFECT(_7(1, expectedError))
           .LR_SIDE_EFFECT(FAIL_CHECK("Exception should have short-circuited this"));
 
       WHEN("resolve is called with kException errorPolicyTag") {
@@ -421,7 +421,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }
@@ -713,7 +713,7 @@ TEMPLATE_TEST_CASE(
       REQUIRE_CALL(mockManagerInterface, preflight(openassetio::EntityReferences{ref},
                                                    openassetio::trait::TraitsDatas{traitsData},
                                                    publishingAccess, context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError));
+          .LR_SIDE_EFFECT(_7(1, expectedError));
 
       WHEN("preflight is called with kException errorPolicyTag") {
         THEN("an exception is thrown") {
@@ -724,7 +724,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }
@@ -738,7 +738,7 @@ TEMPLATE_TEST_CASE(
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, preflight(threeRefs, threeTraitsDatas, publishingAccess,
                                                    context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError))
+          .LR_SIDE_EFFECT(_7(1, expectedError))
           .LR_SIDE_EFFECT(FAIL_CHECK("Exception should have short-circuited this"));
 
       WHEN("preflight is called with kException errorPolicyTag") {
@@ -750,7 +750,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }
@@ -1055,7 +1055,7 @@ TEMPLATE_TEST_CASE(
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface, register_(refs, singleTraitsDatas, publishingAccess,
                                                    context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError));
+          .LR_SIDE_EFFECT(_7(1, expectedError));
 
       WHEN("register is called with kException errorPolicyTag") {
         THEN("an exception is thrown") {
@@ -1066,7 +1066,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }
@@ -1088,7 +1088,7 @@ TEMPLATE_TEST_CASE(
       // With error callback side effect
       REQUIRE_CALL(mockManagerInterface,
                    register_(refs, threeTraitsDatas, publishingAccess, context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(123, expectedError))
+          .LR_SIDE_EFFECT(_7(1, expectedError))
           .LR_SIDE_EFFECT(FAIL_CHECK("Exception should have short-circuited this"));
 
       WHEN("register is called with kException errorPolicyTag") {
@@ -1100,7 +1100,7 @@ TEMPLATE_TEST_CASE(
           } catch (const ExpectedExceptionType& exc) {
             CHECK(exc.what() == expectedError.message);
             CHECK(exc.error == expectedError);
-            CHECK(exc.index == 123);
+            CHECK(exc.index == 1);
           }
         }
       }

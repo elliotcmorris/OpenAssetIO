@@ -1176,7 +1176,7 @@ class Test_Manager_resolve_with_singular_default_overload:
     ):
         method = mock_manager_interface.mock.resolve
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -1258,7 +1258,7 @@ class Test_Manager_resolve_with_singular_throwing_overload:
     ):
         method = mock_manager_interface.mock.resolve
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -1343,7 +1343,7 @@ class Test_Manager_resolve_with_singular_variant_overload:
     ):
         method = mock_manager_interface.mock.resolve
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -1465,7 +1465,7 @@ class Test_Manager_resolve_with_batch_default_overload:
         invoke_resolve_error_cb,
     ):
         method = mock_manager_interface.mock.resolve
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
@@ -1595,7 +1595,7 @@ class Test_Manager_resolve_with_batch_throwing_overload:
         invoke_resolve_error_cb,
     ):
         method = mock_manager_interface.mock.resolve
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
@@ -1913,7 +1913,7 @@ class Test_Manager_preflight_with_singular_default_overload:
     ):
         method = mock_manager_interface.mock.preflight
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2007,7 +2007,7 @@ class Test_Manager_preflight_with_singular_throwing_overload:
     ):
         method = mock_manager_interface.mock.preflight
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2104,7 +2104,7 @@ class Test_Manager_preflight_with_singular_variant_overload:
     ):
         method = mock_manager_interface.mock.preflight
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2234,7 +2234,7 @@ class Test_Manager_preflight_with_batch_default_overload:
         invoke_preflight_error_cb,
     ):
         method = mock_manager_interface.mock.preflight
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
@@ -2377,7 +2377,7 @@ class Test_Manager_preflight_with_batch_throwing_overload:
         invoke_preflight_error_cb,
     ):
         method = mock_manager_interface.mock.preflight
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
@@ -2677,7 +2677,7 @@ class Test_Manager_register_with_singular_default_overload:
     ):
         method = mock_manager_interface.mock.register
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2761,7 +2761,7 @@ class Test_Manager_register_with_singular_throwing_overload:
     ):
         method = mock_manager_interface.mock.register
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2846,7 +2846,7 @@ class Test_Manager_register_with_singular_variant_overload:
     ):
         method = mock_manager_interface.mock.register
 
-        expected_index = 213
+        expected_index = 1
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
         def call_callbacks(*_args):
@@ -2964,7 +2964,7 @@ class Test_Manager_register_with_batch_default_overload:
         invoke_register_error_cb,
     ):
         method = mock_manager_interface.mock.register
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
@@ -3094,7 +3094,7 @@ class Test_Manager_register_with_batch_throwing_overload:
         invoke_register_error_cb,
     ):
         method = mock_manager_interface.mock.register
-        expected_index = 123
+        expected_index = 1
 
         batch_element_error = BatchElementError(error_code, "some string ✨")
 
