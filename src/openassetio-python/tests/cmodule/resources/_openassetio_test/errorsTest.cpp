@@ -19,7 +19,7 @@ namespace {
 using openassetio::errors::BatchElementError;
 using ErrorCode = BatchElementError::ErrorCode;
 
-constexpr const char* kExceptionMessage = "Explosion!";
+constexpr const char* kExceptionMessage = "Explosion 💥!";
 constexpr const char* kEntityReference = "bogus:///entity_reference";
 
 void throwException(const std::string& exceptionName, bool populateArgs = true) {
@@ -27,8 +27,8 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
                                       : std::optional<openassetio::EntityReference>{};
   const auto traitSet = populateArgs ? openassetio::trait::TraitSet{"trait1", "trait2"}
                                      : std::optional<openassetio::trait::TraitSet>{};
-  const auto traitsData = populateArgs ? openassetio::TraitsData::make(traitSet.value())
-                                       : std::optional<openassetio::TraitsDataPtr>{};
+  const auto traitsData = traitSet ? openassetio::TraitsData::make(*traitSet)
+                                   : std::optional<openassetio::TraitsDataPtr>{};
 
   if (exceptionName == "OpenAssetIOException") {
     throw openassetio::errors::OpenAssetIOException(kExceptionMessage);
@@ -45,7 +45,6 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
   if (exceptionName == "UnhandledException") {
     throw openassetio::errors::UnhandledException(kExceptionMessage);
   }
-
   if (exceptionName == "BatchElementException") {
     throw openassetio::errors::BatchElementException(1, {ErrorCode::kUnknown, kExceptionMessage});
   }
@@ -64,11 +63,11 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
   }
   if (exceptionName == "InvalidTraitSetBatchElementException") {
     throw openassetio::errors::InvalidTraitSetBatchElementException(
-        1, {ErrorCode::kInvalidTraitSet, kExceptionMessage}, traitSet, entityRef);
+        1, {ErrorCode::kInvalidTraitSet, kExceptionMessage}, entityRef, traitSet);
   }
   if (exceptionName == "InvalidTraitsDataBatchElementException") {
     throw openassetio::errors::InvalidTraitsDataBatchElementException(
-        1, {ErrorCode::kInvalidTraitsData, kExceptionMessage}, traitsData, entityRef);
+        1, {ErrorCode::kInvalidTraitsData, kExceptionMessage}, entityRef, traitsData);
   }
   if (exceptionName == "EntityAccessErrorBatchElementException") {
     throw openassetio::errors::EntityAccessErrorBatchElementException(
@@ -88,7 +87,7 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
   }
   if (exceptionName == "InvalidPreflightHintBatchElementException") {
     throw openassetio::errors::InvalidPreflightHintBatchElementException(
-        1, {ErrorCode::kInvalidPreflightHint, kExceptionMessage}, traitsData, entityRef);
+        1, {ErrorCode::kInvalidPreflightHint, kExceptionMessage}, entityRef, traitsData);
   }
 }
 }  // namespace

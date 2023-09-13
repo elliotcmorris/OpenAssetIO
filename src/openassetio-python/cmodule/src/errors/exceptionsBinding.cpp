@@ -3,8 +3,8 @@
 #include <string_view>
 
 #include <pybind11/eval.h>
-#include <pybind11/operators.h>
 #include <pybind11/pybind11.h>
+#include <pybind11/stl.h>
 
 #include <openassetio/errors/exceptions.hpp>
 
@@ -99,15 +99,35 @@ void registerBatchElementExceptions(const py::module &mod) {
   // Make sure OpenAssetIOException has already been registered!
   py::exec(R"pybind(
 class BatchElementException(OpenAssetIOException):
-    def __init__(self, index: int, error):
+    def __init__(self, index, error):
         self.index = index
         self.error = error
-        super().__init__(error.message))pybind",
+        super().__init__(error.message)
+
+class BatchElementEntityReferenceException(BatchElementException):
+    def __init__(self, index, error, entityReference):
+        super().__init__(index, error)
+        self.entityReference = entityReference
+
+class InvalidTraitSetBatchElementException(BatchElementEntityReferenceException):
+    def __init__(self, index, error, entityReference, traitSet):
+        super().__init__(index, error, entityReference)
+        self.traitSet = traitSet
+
+class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceException):
+    def __init__(self, index, error, entityReference, traitsData):
+        super().__init__(index, error, entityReference)
+        self.traitsData = traitsData
+)pybind",
            mod.attr("__dict__"), mod.attr("__dict__"));
 
-  // Retrieve a handle the the exception type just created by executing
+  // Retrieve handles to the exception types just created by executing
   // the string literal above.
   const py::object pyBatchElementException = mod.attr("BatchElementException");
+  const py::object pyBatchElementEntityReferenceException =
+      mod.attr("BatchElementEntityReferenceException");
+  const py::object pyInvalidTraitsDataBatchElementException =
+      mod.attr("InvalidTraitsDataBatchElementException");
 
   using openassetio::errors::BatchElementEntityReferenceException;
   using openassetio::errors::BatchElementException;
@@ -131,8 +151,6 @@ class BatchElementException(OpenAssetIOException):
   // Register each of our BatchElement exception types.
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("UnknownBatchElementException", pyBatchElementException);
-  auto pyBatchElementEntityReferenceException =
-      registerPyException("BatchElementEntityReferenceException", pyBatchElementException);
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("InvalidEntityReferenceBatchElementException",
                       pyBatchElementEntityReferenceException);
@@ -145,13 +163,9 @@ class BatchElementException(OpenAssetIOException):
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("EntityResolutionErrorBatchElementException",
                       pyBatchElementEntityReferenceException);
-  auto pyInvalidTraitsDataBatchElementException =
-      registerPyException("InvalidTraitsDataBatchElementException", pyBatchElementException);
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("InvalidPreflightHintBatchElementException",
                       pyInvalidTraitsDataBatchElementException);
-  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-  registerPyException("InvalidTraitSetBatchElementException", pyBatchElementException);
 
   // Register a function that will translate our C++ exceptions to the
   // appropriate Python exception type.
@@ -166,9 +180,11 @@ class BatchElementException(OpenAssetIOException):
 
     // Use CPython's PyErr_SetObject to set a custom exception type as
     // the currently active Python exception in this thread.
-    const auto setPyException = [&pyModule](const char *pyTypeName, const auto &exc) {
+    const auto setPyBatchException = [&pyModule](const char *pyTypeName, const auto &exc,
+                                                 auto &&...args) {
       const py::object pyClass = pyModule.attr(pyTypeName);
-      const py::object pyInstance = pyClass(exc.index, exc.error);
+      const py::object pyInstance =
+          pyClass(exc.index, exc.error, std::forward<decltype(args)>(args)...);
       PyErr_SetObject(pyClass.ptr(), pyInstance.ptr());
     };
 
@@ -178,25 +194,29 @@ class BatchElementException(OpenAssetIOException):
     try {
       std::rethrow_exception(std::move(pexc));
     } catch (const UnknownBatchElementException &exc) {
-      setPyException("UnknownBatchElementException", exc);
+      setPyBatchException("UnknownBatchElementException", exc);
     } catch (const InvalidEntityReferenceBatchElementException &exc) {
-      setPyException("InvalidEntityReferenceBatchElementException", exc);
+      setPyBatchException("InvalidEntityReferenceBatchElementException", exc, exc.entityReference);
     } catch (const MalformedEntityReferenceBatchElementException &exc) {
-      setPyException("MalformedEntityReferenceBatchElementException", exc);
+      setPyBatchException("MalformedEntityReferenceBatchElementException", exc,
+                          exc.entityReference);
     } catch (const EntityAccessErrorBatchElementException &exc) {
-      setPyException("EntityAccessErrorBatchElementException", exc);
+      setPyBatchException("EntityAccessErrorBatchElementException", exc, exc.entityReference);
     } catch (const EntityResolutionErrorBatchElementException &exc) {
-      setPyException("EntityResolutionErrorBatchElementException", exc);
+      setPyBatchException("EntityResolutionErrorBatchElementException", exc, exc.entityReference);
     } catch (const InvalidPreflightHintBatchElementException &exc) {
-      setPyException("InvalidPreflightHintBatchElementException", exc);
+      setPyBatchException("InvalidPreflightHintBatchElementException", exc, exc.entityReference,
+                          exc.traitsData);
     } catch (const InvalidTraitSetBatchElementException &exc) {
-      setPyException("InvalidTraitSetBatchElementException", exc);
+      setPyBatchException("InvalidTraitSetBatchElementException", exc, exc.entityReference,
+                          exc.traitSet);
     } catch (const InvalidTraitsDataBatchElementException &exc) {
-      setPyException("InvalidTraitsDataBatchElementException", exc);
+      setPyBatchException("InvalidTraitsDataBatchElementException", exc, exc.entityReference,
+                          exc.traitsData);
     } catch (const BatchElementEntityReferenceException &exc) {
-      setPyException("BatchElementEntityReferenceException", exc);
+      setPyBatchException("BatchElementEntityReferenceException", exc, exc.entityReference);
     } catch (const BatchElementException &exc) {
-      setPyException("BatchElementException", exc);
+      setPyBatchException("BatchElementException", exc);
     }
   });
 }

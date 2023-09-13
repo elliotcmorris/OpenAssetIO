@@ -60,16 +60,16 @@ void throwFromBatchElementError(std::size_t index, errors::BatchElementError err
                                                                std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kInvalidTraitsData:
       throw errors::InvalidTraitsDataBatchElementException(index, std::move(error),
-                                                           std::move(exceptionData.traitsData),
-                                                           std::move(exceptionData.entityRef));
+                                                           std::move(exceptionData.entityRef),
+                                                           std::move(exceptionData.traitsData));
     case errors::BatchElementError::ErrorCode::kInvalidPreflightHint:
       throw errors::InvalidPreflightHintBatchElementException(index, std::move(error),
-                                                              std::move(exceptionData.traitsData),
-                                                              std::move(exceptionData.entityRef));
+                                                              std::move(exceptionData.entityRef),
+                                                              std::move(exceptionData.traitsData));
     case errors::BatchElementError::ErrorCode::kInvalidTraitSet:
       throw errors::InvalidTraitSetBatchElementException(index, std::move(error),
-                                                         std::move(exceptionData.traitSet),
-                                                         std::move(exceptionData.entityRef));
+                                                         std::move(exceptionData.entityRef),
+                                                         std::move(exceptionData.traitSet));
     default:
       std::string exceptionMessage = "Invalid BatchElementError. Code: ";
       exceptionMessage += std::to_string(static_cast<int>(error.code));
