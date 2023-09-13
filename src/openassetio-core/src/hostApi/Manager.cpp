@@ -434,6 +434,7 @@ EntityReference Manager::preflight(
         BatchElementExceptionData data;
         data.entityRef = entityReference;
         data.traitsData = traitsHint;
+        data.traitSet = traitsHint->traitSet();
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
@@ -473,6 +474,7 @@ EntityReferences Manager::preflight(
         BatchElementExceptionData data;
         data.entityRef = entityReferences[index];
         data.traitsData = traitsHints[index];
+        data.traitSet = traitsHints[index]->traitSet();
         // Implemented as if FAILFAST is true.
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });
@@ -531,6 +533,7 @@ EntityReference hostApi::Manager::register_(
         BatchElementExceptionData data;
         data.entityRef = entityReference;
         data.traitsData = entityTraitsData;
+        data.traitSet = entityTraitsData->traitSet();
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });
 
@@ -572,6 +575,7 @@ std::vector<EntityReference> hostApi::Manager::register_(
         BatchElementExceptionData data;
         data.entityRef = entityReferences[index];
         data.traitsData = entityTraitsDatas[index];
+        data.traitSet = entityTraitsDatas[index]->traitSet();
         // Implemented as if FAILFAST is true
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });

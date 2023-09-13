@@ -109,6 +109,9 @@ struct OPENASSETIO_CORE_EXPORT BatchElementException : std::runtime_error {
   BatchElementException(std::size_t idx, BatchElementError err)
       : std::runtime_error{err.message}, index{idx}, error{std::move(err)} {}
 
+  BatchElementException(std::size_t idx, BatchElementError err, const std::string& msg)
+      : std::runtime_error{msg}, index{idx}, error{std::move(err)} {}
+
   /**
    * Index describing which batch element has caused an error.
    */
@@ -137,9 +140,11 @@ struct OPENASSETIO_CORE_EXPORT UnknownBatchElementException : BatchElementExcept
  */
 struct OPENASSETIO_CORE_EXPORT BatchElementEntityReferenceException : BatchElementException {
   BatchElementEntityReferenceException(std::size_t idx, BatchElementError err,
-                                       std::optional<EntityReference> causedByEntityReference)
-      : BatchElementException(idx, std::move(err)),
-        entityReference{std::move(causedByEntityReference)} {}
+                                       std::optional<EntityReference> causedByEntityReference);
+
+  /**
+   * Entity that the error relates to, if available.
+   */
   std::optional<EntityReference> entityReference;
 };
 
@@ -195,6 +200,10 @@ struct OPENASSETIO_CORE_EXPORT InvalidTraitsDataBatchElementException
       : BatchElementEntityReferenceException{idx, std::move(err),
                                              std::move(causedByEntityReference)},
         traitsData{std::move(causedByTraitsData)} {}
+
+  /**
+   * Traits and properties that the error relates to, if available.
+   */
   std::optional<TraitsDataPtr> traitsData;
 };
 
@@ -219,6 +228,10 @@ struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException
       : BatchElementEntityReferenceException{idx, std::move(err),
                                              std::move(causedByEntityReference)},
         traitSet{std::move(causedByTraitSet)} {}
+
+  /**
+   * Trait set that the error relates to, if available.
+   */
   std::optional<trait::TraitSet> traitSet;
 };
 

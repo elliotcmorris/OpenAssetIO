@@ -34,6 +34,8 @@ target_link_libraries(
     Catch2::Catch2
     # Mocking framework.
     trompeloeil::trompeloeil
+    # String formatting helper.
+    fmt::fmt-header-only
     # Lib under test.
     openassetio-core
 )

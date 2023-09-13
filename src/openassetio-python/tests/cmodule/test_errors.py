@@ -16,7 +16,7 @@
 """
 Tests of C++ binding utilities for exception types.
 """
-
+import re
 # pylint: disable=no-self-use
 # pylint: disable=invalid-name,redefined-outer-name
 # pylint: disable=missing-class-docstring,missing-function-docstring
@@ -30,6 +30,7 @@ from openassetio import errors, EntityReference, TraitsData
 
 expected_error_message = "Explosion 💥!"
 expected_entity_reference = EntityReference("bogus:///entity_reference")
+expected_entity_error_message = f"{expected_error_message} [{expected_entity_reference}]"
 
 all_exception_types = (
     errors.OpenAssetIOException,
@@ -126,8 +127,13 @@ class Test_exception_hierarchy:
 
 class Test_exception_data:
     @pytest.mark.parametrize("exception_type", all_exception_types)
-    def test_when_cpp_exception_thrown_then_message_is_retained(self, exception_type):
+    def test_when_nonentity_cpp_exception_thrown_then_message_is_retained(self, exception_type):
         with pytest.raises(exception_type, match=f"^{expected_error_message}$"):
+            _openassetio_test.throwExceptionWithUnpopulatedArgs(exception_type.__name__)
+
+    @pytest.mark.parametrize("exception_type", entity_reference_exceptions)
+    def test_when_batch_entity_cpp_exception_thrown_then_message_is_retained(self, exception_type):
+        with pytest.raises(exception_type, match=f"^{re.escape(expected_entity_error_message)}$"):
             _openassetio_test.throwExceptionWithPopulatedArgs(exception_type.__name__)
 
     @pytest.mark.parametrize(
