@@ -37,10 +37,24 @@ struct BatchElementExceptionData {
   std::optional<trait::TraitSet> traitSet = {};
 };
 
-// Takes a BatchElementError and throws an equivalent exception.
-// Our exception types generally expect either an entityReference or
-// a traitsDataPtr and an optional entityReference. Defer to the type
-// in the error then access expected values.
+/**
+ * Takes a BatchElementError and throws an equivalent exception.
+ *
+ * Most exception types provide additional data, in particular an entity
+ * reference. Defer to the type in the error, then access expected
+ * values.
+ *
+ * Additional data members are all optional, since we have no guarantee
+ * that a manager will use an appropriate BatchElementError code, such
+ * that the data required to construct the exception is available at the
+ * call site.
+ *
+ * @param index Index of element in the batch that caused the
+ * BatchElementError.
+ * @param error The error object provided by the manager plugin to wrap.
+ * @param exceptionData Additional data members to use in construction
+ * of the corresponding exception.
+ */
 void throwFromBatchElementError(std::size_t index, errors::BatchElementError error,
                                 BatchElementExceptionData exceptionData = {}) {
   switch (error.code) {
