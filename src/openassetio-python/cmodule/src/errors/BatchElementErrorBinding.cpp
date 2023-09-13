@@ -20,6 +20,7 @@ void registerBatchElementError(const py::module &mod) {
       .value("kMalformedEntityReference", BatchElementError::ErrorCode::kMalformedEntityReference)
       .value("kEntityAccessError", BatchElementError::ErrorCode::kEntityAccessError)
       .value("kEntityResolutionError", BatchElementError::ErrorCode::kEntityResolutionError)
+      .value("kInvalidTraitsData", BatchElementError::ErrorCode::kInvalidTraitsData)
       .value("kInvalidPreflightHint", BatchElementError::ErrorCode::kInvalidPreflightHint)
       .value("kInvalidTraitSet", BatchElementError::ErrorCode::kInvalidTraitSet);
 
