@@ -70,14 +70,13 @@ void throwFromBatchElementError(std::size_t index, errors::BatchElementError err
       throw errors::InvalidTraitSetBatchElementException(index, std::move(error),
                                                          std::move(exceptionData.entityRef),
                                                          std::move(exceptionData.traitSet));
-    default:
-      std::string exceptionMessage = "Invalid BatchElementError. Code: ";
-      exceptionMessage += std::to_string(static_cast<int>(error.code));
-      exceptionMessage += " Message: ";
-      exceptionMessage += error.message;
-      error.message = std::move(exceptionMessage);
-      throw errors::UnknownBatchElementException{index, std::move(error)};
   }
+  std::string exceptionMessage = "Invalid BatchElementError. Code: ";
+  exceptionMessage += std::to_string(static_cast<int>(error.code));
+  exceptionMessage += " Message: ";
+  exceptionMessage += error.message;
+  error.message = std::move(exceptionMessage);
+  throw errors::UnknownBatchElementException{index, std::move(error)};
 }
 
 /**
