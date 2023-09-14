@@ -78,7 +78,6 @@ batch_element_error_codes = (
 
 entity_reference_exceptions = (
     errors.BatchElementEntityReferenceException,
-    errors.EntityAccessErrorBatchElementException,
     errors.InvalidEntityReferenceBatchElementException,
     errors.MalformedEntityReferenceBatchElementException,
     errors.EntityResolutionErrorBatchElementException,
@@ -165,11 +164,13 @@ class Test_exception_data:
         with pytest.raises(exception_type) as exc:
             _openassetio_test.throwExceptionWithUnpopulatedArgs(exception_type.__name__)
 
+        assert exc.value.entityReference is None
         assert exc.value.traitSet is None
 
         with pytest.raises(exception_type) as exc:
             _openassetio_test.throwExceptionWithPopulatedArgs(exception_type.__name__)
 
+        assert exc.value.entityReference == expected_entity_reference
         assert exc.value.traitSet == {"trait1", "trait2"}
 
     @pytest.mark.parametrize(
@@ -185,9 +186,11 @@ class Test_exception_data:
         with pytest.raises(exception_type) as exc:
             _openassetio_test.throwExceptionWithUnpopulatedArgs(exception_type.__name__)
 
+        assert exc.value.entityReference is None
         assert exc.value.traitsData is None
 
         with pytest.raises(exception_type) as exc:
             _openassetio_test.throwExceptionWithPopulatedArgs(exception_type.__name__)
 
+        assert exc.value.entityReference == expected_entity_reference
         assert exc.value.traitsData == TraitsData({"trait1", "trait2"})
