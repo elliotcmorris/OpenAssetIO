@@ -18,7 +18,8 @@ target_sources(openassetio-core-cpp-test-exe
     PRIVATE
     main.cpp
     typedefsTest.cpp
-    BatchElementErrorTest.cpp
+    errors/BatchElementErrorTest.cpp
+    errors/exceptionsTest.cpp
     ContextTest.cpp
     TraitsDataTest.cpp
     hostApi/ManagerTest.cpp

@@ -381,8 +381,7 @@ struct EntityBatchElementErrorMapping : BatchElementErrorMapping<T, C> {
   using Base::kExpectedEntityReference;
 
   /// Check exception contains entity reference, if available.
-  static void assertExceptionData(const errors::BatchElementEntityReferenceException& exc,
-                                  const int hasDataFor) {
+  static void assertExceptionData(const T& exc, const int hasDataFor) {
     if (hasDataFor & HasDataFor::kEntityReference) {
       CHECK(exc.what() == fmt::format("{} [{}]", kErrorMessage, kExpectedEntityReference));
       CHECK(exc.entityReference == openassetio::EntityReference{kExpectedEntityReference});
@@ -403,8 +402,7 @@ struct InvalidTraitSetBatchElementErrorMapping : EntityBatchElementErrorMapping<
   using Base::kExpectedTraitSet;
 
   /// Check exception contains trait set, if available.
-  static void assertExceptionData(const errors::InvalidTraitSetBatchElementException& exc,
-                                  const int hasDataFor) {
+  static void assertExceptionData(const T& exc, const int hasDataFor) {
     Base::assertExceptionData(exc, hasDataFor);
     if (hasDataFor & HasDataFor::kTraitSet) {
       CHECK(exc.traitSet.value() == kExpectedTraitSet);
@@ -425,8 +423,7 @@ struct InvalidTraitsDataBatchElementErrorMapping : EntityBatchElementErrorMappin
   using Base::kExpectedTraitsData;
 
   /// Check exception contains trait data, if available.
-  static void assertExceptionData(const errors::InvalidTraitsDataBatchElementException& exc,
-                                  const int hasDataFor) {
+  static void assertExceptionData(const T& exc, const int hasDataFor) {
     Base::assertExceptionData(exc, hasDataFor);
     if (hasDataFor & HasDataFor::kTraitsData) {
       CHECK(*exc.traitsData.value() == *kExpectedTraitsData);

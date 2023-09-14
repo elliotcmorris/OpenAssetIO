@@ -82,9 +82,6 @@ entity_reference_exceptions = (
     errors.InvalidEntityReferenceBatchElementException,
     errors.MalformedEntityReferenceBatchElementException,
     errors.EntityResolutionErrorBatchElementException,
-    errors.InvalidTraitSetBatchElementException,
-    errors.InvalidTraitsDataBatchElementException,
-    errors.InvalidPreflightHintBatchElementException,
 )
 
 

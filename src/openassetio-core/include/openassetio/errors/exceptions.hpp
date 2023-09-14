@@ -105,12 +105,12 @@ struct OPENASSETIO_CORE_EXPORT UnhandledException : OpenAssetIOException {
  * element has caused an error. The specific element that has errored
  * is indicated by the index attribute, relative to the input container.
  */
-struct OPENASSETIO_CORE_EXPORT BatchElementException : std::runtime_error {
+struct OPENASSETIO_CORE_EXPORT BatchElementException : OpenAssetIOException {
   BatchElementException(std::size_t idx, BatchElementError err)
-      : std::runtime_error{err.message}, index{idx}, error{std::move(err)} {}
+      : OpenAssetIOException{err.message}, index{idx}, error{std::move(err)} {}
 
-  BatchElementException(std::size_t idx, BatchElementError err, const std::string& msg)
-      : std::runtime_error{msg}, index{idx}, error{std::move(err)} {}
+  BatchElementException(const std::string& msg, std::size_t idx, BatchElementError err)
+      : OpenAssetIOException{msg}, index{idx}, error{std::move(err)} {}
 
   /**
    * Index describing which batch element has caused an error.
@@ -168,20 +168,24 @@ struct OPENASSETIO_CORE_EXPORT MalformedEntityReferenceBatchElementException
 
 /**
  * Exception equivalent of
- * @ref errors.BatchElementError.ErrorCode.kEntityAccessError
+ * @ref errors.BatchElementError.ErrorCode.kEntityResolutionError
  */
-struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException
+struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
     : BatchElementEntityReferenceException {
   using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
 };
 
 /**
  * Exception equivalent of
- * @ref errors.BatchElementError.ErrorCode.kEntityResolutionError
+ * @ref errors.BatchElementError.ErrorCode.kEntityAccessError
  */
-struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
-    : BatchElementEntityReferenceException {
-  using BatchElementEntityReferenceException::BatchElementEntityReferenceException;
+struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
+  EntityAccessErrorBatchElementException(std::size_t idx, BatchElementError err,
+                                         std::optional<EntityReference> causedByEntityReference);
+  /**
+   * Entity that the error relates to, if available.
+   */
+  std::optional<EntityReference> entityReference;
 };
 
 /**
@@ -192,15 +196,14 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
  * EntityReference, these errors may optionally be able to provide a
  * contextual @ref EntityReference.
  */
-struct OPENASSETIO_CORE_EXPORT InvalidTraitsDataBatchElementException
-    : BatchElementEntityReferenceException {
+struct OPENASSETIO_CORE_EXPORT InvalidTraitsDataBatchElementException : BatchElementException {
   InvalidTraitsDataBatchElementException(std::size_t idx, BatchElementError err,
                                          std::optional<EntityReference> causedByEntityReference,
-                                         std::optional<TraitsDataPtr> causedByTraitsData)
-      : BatchElementEntityReferenceException{idx, std::move(err),
-                                             std::move(causedByEntityReference)},
-        traitsData{std::move(causedByTraitsData)} {}
-
+                                         std::optional<TraitsDataPtr> causedByTraitsData);
+  /**
+   * Entity that the error relates to, if available.
+   */
+  std::optional<EntityReference> entityReference;
   /**
    * Traits and properties that the error relates to, if available.
    */
@@ -220,15 +223,15 @@ struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException
  * Exception equivalent of
  * @ref errors.BatchElementError.ErrorCode.kInvalidTraitSet
  */
-struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException
-    : BatchElementEntityReferenceException {
+struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
   InvalidTraitSetBatchElementException(std::size_t idx, BatchElementError err,
                                        std::optional<EntityReference> causedByEntityReference,
-                                       std::optional<trait::TraitSet> causedByTraitSet)
-      : BatchElementEntityReferenceException{idx, std::move(err),
-                                             std::move(causedByEntityReference)},
-        traitSet{std::move(causedByTraitSet)} {}
+                                       std::optional<trait::TraitSet> causedByTraitSet);
 
+  /**
+   * Entity that the error relates to, if available.
+   */
+  std::optional<EntityReference> entityReference;
   /**
    * Trait set that the error relates to, if available.
    */
