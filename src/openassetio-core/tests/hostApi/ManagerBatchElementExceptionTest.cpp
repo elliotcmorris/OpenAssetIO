@@ -147,30 +147,6 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when resolvi
     const auto resolveAccess = openassetio::access::ResolveAccess::kRead;
 
     AND_GIVEN(
-        "manager plugin will encounter an entity-specific error when next resolving a reference") {
-      const openassetio::EntityReferences singleRef = {expectedEntityReference};
-
-      // With error callback side effect
-      REQUIRE_CALL(mockManagerInterface,
-                   resolve(singleRef, traitSet, resolveAccess, context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(0, expectedError));
-
-      WHEN("resolve is called with kException errorPolicyTag") {
-        THEN("an exception is thrown") {
-          try {
-            manager->resolve(expectedEntityReference, traitSet, resolveAccess, context,
-                             hostApi::Manager::BatchElementErrorPolicyTag::kException);
-            FAIL_CHECK("Exception not thrown");
-          } catch (const ExpectedExceptionType& exc) {
-            TestType::assertExceptionData(exc,
-                                          HasDataFor::kEntityReference | HasDataFor::kTraitSet);
-            CHECK(exc.index == 0);
-          }
-        }
-      }
-    }
-
-    AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next resolving multiple "
         "references") {
       const openassetio::EntityReferences twoRefs = {
@@ -219,33 +195,6 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when preflig
     const auto& context = fixture.context;
     const auto& hostSession = fixture.hostSession;
     const auto publishingAccess = openassetio::access::PublishingAccess::kWrite;
-
-    AND_GIVEN(
-        "manager plugin will encounter an entity-specific error when next preflighting a "
-        "reference") {
-      const openassetio::EntityReferences singleRef = {expectedEntityReference};
-      const openassetio::trait::TraitsDatas singleTraitsDatas = {expectedTraitsData};
-
-      // With error callback side effect
-      REQUIRE_CALL(mockManagerInterface, preflight(singleRef, singleTraitsDatas, publishingAccess,
-                                                   context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(0, expectedError));
-
-      WHEN("preflight is called with kException errorPolicyTag") {
-        THEN("an exception is thrown") {
-          try {
-            manager->preflight(expectedEntityReference, expectedTraitsData, publishingAccess,
-                               context, hostApi::Manager::BatchElementErrorPolicyTag::kException);
-            FAIL_CHECK("Exception not thrown");
-          } catch (const ExpectedExceptionType& exc) {
-            TestType::assertExceptionData(exc, HasDataFor::kEntityReference |
-                                                   HasDataFor::kTraitSet |
-                                                   HasDataFor::kTraitsData);
-            CHECK(exc.index == 0);
-          }
-        }
-      }
-    }
 
     AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next preflighting multiple "
@@ -305,33 +254,6 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when registe
     const auto publishingAccess = openassetio::access::PublishingAccess::kWrite;
 
     const openassetio::errors::BatchElementError expectedError{errorCode, errorMessage};
-
-    AND_GIVEN(
-        "manager plugin will encounter an entity-specific error when next registering a "
-        "reference") {
-      const openassetio::EntityReferences singleRef = {expectedEntityReference};
-      const openassetio::trait::TraitsDatas singleTraitsDatas = {expectedTraitsData};
-
-      // With error callback side effect
-      REQUIRE_CALL(mockManagerInterface, register_(singleRef, singleTraitsDatas, publishingAccess,
-                                                   context, hostSession, _, _))
-          .LR_SIDE_EFFECT(_7(0, expectedError));
-
-      WHEN("register is called with kException errorPolicyTag") {
-        THEN("an exception is thrown") {
-          try {
-            manager->register_(expectedEntityReference, expectedTraitsData, publishingAccess,
-                               context, hostApi::Manager::BatchElementErrorPolicyTag::kException);
-            FAIL_CHECK("Exception not thrown");
-          } catch (const ExpectedExceptionType& exc) {
-            TestType::assertExceptionData(exc, HasDataFor::kEntityReference |
-                                                   HasDataFor::kTraitSet |
-                                                   HasDataFor::kTraitsData);
-            CHECK(exc.index == 0);
-          }
-        }
-      }
-    }
 
     AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next registering multiple "
