@@ -99,24 +99,24 @@ void registerBatchElementExceptions(const py::module &mod) {
   // Make sure OpenAssetIOException has already been registered!
   py::exec(R"pybind(
 class BatchElementException(OpenAssetIOException):
-    def __init__(self, index, error):
+    def __init__(self, message, index, error):
         self.index = index
         self.error = error
-        super().__init__(error.message)
+        super().__init__(message)
 
 class BatchElementEntityReferenceException(BatchElementException):
-    def __init__(self, index, error, entityReference):
-        super().__init__(index, error)
+    def __init__(self, message, index, error, entityReference):
+        super().__init__(message, index, error)
         self.entityReference = entityReference
 
 class InvalidTraitSetBatchElementException(BatchElementEntityReferenceException):
-    def __init__(self, index, error, entityReference, traitSet):
-        super().__init__(index, error, entityReference)
+    def __init__(self, message, index, error, entityReference, traitSet):
+        super().__init__(message, index, error, entityReference)
         self.traitSet = traitSet
 
 class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceException):
-    def __init__(self, index, error, entityReference, traitsData):
-        super().__init__(index, error, entityReference)
+    def __init__(self, message, index, error, entityReference, traitsData):
+        super().__init__(message, index, error, entityReference)
         self.traitsData = traitsData
 )pybind",
            mod.attr("__dict__"), mod.attr("__dict__"));
@@ -184,7 +184,7 @@ class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceExceptio
                                                  auto &&...args) {
       const py::object pyClass = pyModule.attr(pyTypeName);
       const py::object pyInstance =
-          pyClass(exc.index, exc.error, std::forward<decltype(args)>(args)...);
+          pyClass(exc.what(), exc.index, exc.error, std::forward<decltype(args)>(args)...);
       PyErr_SetObject(pyClass.ptr(), pyInstance.ptr());
     };
 
