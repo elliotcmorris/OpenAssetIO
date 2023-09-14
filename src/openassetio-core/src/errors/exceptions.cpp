@@ -15,9 +15,9 @@ namespace errors {
 namespace {
 std::string constructErrorMessage(const openassetio::Str& batchElementErrorMessage,
                                   const std::optional<EntityReference>& maybeEntityReference) {
-  return fmt::format("{} [{}]", batchElementErrorMessage,
-                     maybeEntityReference ? (*maybeEntityReference).toString()
-                                          : openassetio::Str{"<entity reference not provided>"});
+  return maybeEntityReference
+             ? fmt::format("{} [{}]", batchElementErrorMessage, (*maybeEntityReference).toString())
+             : batchElementErrorMessage;
 }
 }  // namespace
 
