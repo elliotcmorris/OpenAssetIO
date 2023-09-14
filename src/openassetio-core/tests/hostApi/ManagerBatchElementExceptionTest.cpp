@@ -4,12 +4,20 @@
 
 #include "./ManagerTest.hpp"
 
+#include <openassetio/access.hpp>
+
 namespace errors = openassetio::errors;
+namespace access = openassetio::access;
 using ErrorCode = errors::BatchElementError::ErrorCode;
 
 /// Boolean flags to describe what data an API function should provide
 /// as data members to a BatchElementException.
-enum HasDataFor { kEntityReference = 1 << 0, kTraitSet = 1 << 1, kTraitsData = 1 << 2 };
+enum HasDataFor {
+  kEntityReference = 1 << 0,
+  kTraitSet = 1 << 1,
+  kTraitsData = 1 << 2,
+  kAccess = 1 << 3
+};
 
 /**
  * Parametrization fixture for mapping a BatchElementError code to an
@@ -25,7 +33,10 @@ struct BatchElementErrorMapping {
   static constexpr std::string_view kErrorMessage = "You have a 🐛";
   /// Expected entity reference to use in tests, where appropriate..
   static inline const std::string kExpectedEntityReference = "my://entity/reference";
-  /// Expected trait set to use in tests, where appropriate..
+  /// Expected access mode to use in tests.
+  static constexpr access::Access kExpectedAccess = access::Access::kWrite;
+  static inline const openassetio::Str kExpectedAccessName = access::kAccessNames[kExpectedAccess];
+  /// Expected trait set to use in tests, where appropriate.
   static inline const openassetio::trait::TraitSet kExpectedTraitSet = {"trait1", "trait2"};
   /// Expected traits data to use in tests, where appropriate.
   static inline const openassetio::TraitsDataPtr kExpectedTraitsData = [] {
@@ -50,6 +61,8 @@ template <class T, ErrorCode C>
 struct EntityBatchElementErrorMapping : BatchElementErrorMapping<T, C> {
   using Base = BatchElementErrorMapping<T, C>;
   using Base::kErrorMessage;
+  using Base::kExpectedAccess;
+  using Base::kExpectedAccessName;
   using Base::kExpectedEntityReference;
 
   /// Check exception contains entity reference, if available.
@@ -58,6 +71,39 @@ struct EntityBatchElementErrorMapping : BatchElementErrorMapping<T, C> {
       CHECK(exc.what() == fmt::format("{} [{}]", kErrorMessage, kExpectedEntityReference));
       CHECK(exc.entityReference == openassetio::EntityReference{kExpectedEntityReference});
     } else {
+      CHECK(!exc.entityReference.has_value());
+      Base::assertExceptionData(exc, hasDataFor);
+    }
+  }
+};
+
+/**
+ * Parametrization fixture for mapping BatchElementError to an
+ * exception, where an access mode can/should be provided as an
+ * exception data member.
+ */
+template <class T, ErrorCode C>
+struct EntityAccessBatchElementErrorMapping : EntityBatchElementErrorMapping<T, C> {
+  using Base = EntityBatchElementErrorMapping<T, C>;
+  using Base::kErrorMessage;
+  using Base::kExpectedAccess;
+  using Base::kExpectedAccessName;
+  using Base::kExpectedEntityReference;
+
+  /// Check exception contains entity reference and access mode, if
+  /// available.
+  static void assertExceptionData(const T& exc, const int hasDataFor) {
+    if (hasDataFor & (HasDataFor::kEntityReference | HasDataFor::kAccess)) {
+      CHECK(exc.what() == fmt::format("{} [access={}][{}]", kErrorMessage, kExpectedAccessName,
+                                      kExpectedEntityReference));
+      CHECK(exc.entityReference == openassetio::EntityReference{kExpectedEntityReference});
+      CHECK(exc.access == kExpectedAccess);
+    } else {
+      if (hasDataFor & HasDataFor::kAccess) {
+        CHECK(exc.access == kExpectedAccess);
+      } else {
+        CHECK(!exc.access.has_value());
+      }
       Base::assertExceptionData(exc, hasDataFor);
     }
   }
@@ -113,10 +159,10 @@ using BatchElementErrorMappings = std::tuple<
                                    ErrorCode::kInvalidEntityReference>,
     EntityBatchElementErrorMapping<errors::MalformedEntityReferenceBatchElementException,
                                    ErrorCode::kMalformedEntityReference>,
-    EntityBatchElementErrorMapping<errors::EntityAccessErrorBatchElementException,
-                                   ErrorCode::kEntityAccessError>,
     EntityBatchElementErrorMapping<errors::EntityResolutionErrorBatchElementException,
                                    ErrorCode::kEntityResolutionError>,
+    EntityAccessBatchElementErrorMapping<errors::EntityAccessErrorBatchElementException,
+                                         ErrorCode::kEntityAccessError>,
     InvalidTraitsDataBatchElementErrorMapping<errors::InvalidTraitsDataBatchElementException,
                                               ErrorCode::kInvalidTraitsData>,
     InvalidTraitsDataBatchElementErrorMapping<errors::InvalidPreflightHintBatchElementException,
@@ -135,6 +181,8 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when resolvi
   const openassetio::Str errorMessage{TestType::kErrorMessage};
   const openassetio::EntityReference expectedEntityReference =
       openassetio::EntityReference{TestType::kExpectedEntityReference};
+  const auto resolveAccess =
+      static_cast<openassetio::access::ResolveAccess>(TestType::kExpectedAccess);
   const openassetio::trait::TraitSet traitSet = TestType::kExpectedTraitSet;
   const openassetio::errors::BatchElementError expectedError{errorCode, errorMessage};
 
@@ -144,7 +192,6 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when resolvi
     auto& mockManagerInterface = fixture.mockManagerInterface;
     const auto& context = fixture.context;
     const auto& hostSession = fixture.hostSession;
-    const auto resolveAccess = openassetio::access::ResolveAccess::kRead;
 
     AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next resolving multiple "
@@ -165,8 +212,8 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when resolvi
                              hostApi::Manager::BatchElementErrorPolicyTag::kException);
             FAIL_CHECK("Exception not thrown");
           } catch (const ExpectedExceptionType& exc) {
-            TestType::assertExceptionData(exc,
-                                          HasDataFor::kEntityReference | HasDataFor::kTraitSet);
+            TestType::assertExceptionData(
+                exc, HasDataFor::kEntityReference | HasDataFor::kTraitSet | HasDataFor::kAccess);
             CHECK(exc.index == 1);
           }
         }
@@ -185,6 +232,8 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when preflig
   const ErrorCode errorCode = TestType::kErrorCode;
   const std::string errorMessage{TestType::kErrorMessage};
   const openassetio::EntityReference expectedEntityReference{TestType::kExpectedEntityReference};
+  const auto publishingAccess =
+      static_cast<openassetio::access::PublishingAccess>(TestType::kExpectedAccess);
   const openassetio::TraitsDataPtr expectedTraitsData = TestType::kExpectedTraitsData;
   const openassetio::errors::BatchElementError expectedError{errorCode, errorMessage};
 
@@ -194,7 +243,6 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when preflig
     auto& mockManagerInterface = fixture.mockManagerInterface;
     const auto& context = fixture.context;
     const auto& hostSession = fixture.hostSession;
-    const auto publishingAccess = openassetio::access::PublishingAccess::kWrite;
 
     AND_GIVEN(
         "manager plugin will encounter entity-specific errors when next preflighting multiple "
@@ -223,7 +271,7 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when preflig
           } catch (const ExpectedExceptionType& exc) {
             TestType::assertExceptionData(exc, HasDataFor::kEntityReference |
                                                    HasDataFor::kTraitSet |
-                                                   HasDataFor::kTraitsData);
+                                                   HasDataFor::kTraitsData | HasDataFor::kAccess);
             CHECK(exc.index == 1);
           }
         }
@@ -242,16 +290,16 @@ TEMPLATE_LIST_TEST_CASE("BatchElementError conversion to exceptions when registe
   const ErrorCode errorCode = TestType::kErrorCode;
   const std::string errorMessage{TestType::kErrorMessage};
   const openassetio::EntityReference expectedEntityReference{TestType::kExpectedEntityReference};
+  const auto publishingAccess =
+      static_cast<openassetio::access::PublishingAccess>(TestType::kExpectedAccess);
   const openassetio::TraitsDataPtr expectedTraitsData = TestType::kExpectedTraitsData;
 
   GIVEN("a configured Manager instance") {
-    const openassetio::trait::TraitSet traits = {"fakeTrait", "secondFakeTrait"};
     const openassetio::ManagerFixture fixture;
     const auto& manager = fixture.manager;
     auto& mockManagerInterface = fixture.mockManagerInterface;
     const auto& context = fixture.context;
     const auto& hostSession = fixture.hostSession;
-    const auto publishingAccess = openassetio::access::PublishingAccess::kWrite;
 
     const openassetio::errors::BatchElementError expectedError{errorCode, errorMessage};
 

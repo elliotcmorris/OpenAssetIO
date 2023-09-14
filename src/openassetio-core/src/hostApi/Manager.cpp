@@ -35,6 +35,7 @@ struct BatchElementExceptionData {
   std::optional<EntityReference> entityRef = {};
   std::optional<TraitsDataPtr> traitsData = {};
   std::optional<trait::TraitSet> traitSet = {};
+  std::optional<access::Access> access = {};
 };
 
 /**
@@ -67,8 +68,8 @@ void throwFromBatchElementError(std::size_t index, errors::BatchElementError err
       throw errors::MalformedEntityReferenceBatchElementException(
           index, std::move(error), std::move(exceptionData.entityRef));
     case errors::BatchElementError::ErrorCode::kEntityAccessError:
-      throw errors::EntityAccessErrorBatchElementException(index, std::move(error),
-                                                           std::move(exceptionData.entityRef));
+      throw errors::EntityAccessErrorBatchElementException(
+          index, std::move(error), std::move(exceptionData.entityRef), exceptionData.access);
     case errors::BatchElementError::ErrorCode::kEntityResolutionError:
       throw errors::EntityResolutionErrorBatchElementException(index, std::move(error),
                                                                std::move(exceptionData.entityRef));
@@ -244,9 +245,11 @@ TraitsDataPtr hostApi::Manager::resolve(
       [&resolveResult]([[maybe_unused]] std::size_t index, TraitsDataPtr data) {
         resolveResult = std::move(data);
       },
-      [&entityReference, &traitSet](std::size_t index, errors::BatchElementError error) {
+      [&entityReference, &traitSet, &resolveAccess](std::size_t index,
+                                                    errors::BatchElementError error) {
         BatchElementExceptionData data;
         data.entityRef = entityReference;
+        data.access = static_cast<access::Access>(resolveAccess);
         data.traitSet = traitSet;
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });
@@ -285,10 +288,12 @@ std::vector<TraitsDataPtr> hostApi::Manager::resolve(
       [&resolveResult](std::size_t index, TraitsDataPtr data) {
         resolveResult[index] = std::move(data);
       },
-      [&entityReferences, &traitSet](std::size_t index, errors::BatchElementError error) {
+      [&entityReferences, &traitSet, &resolveAccess](std::size_t index,
+                                                     errors::BatchElementError error) {
         // Implemented as if FAILFAST is true.
         BatchElementExceptionData data;
         data.entityRef = entityReferences[index];
+        data.access = static_cast<access::Access>(resolveAccess);
         data.traitSet = traitSet;
         throwFromBatchElementError(index, std::move(error), std::move(data));
       });
@@ -430,9 +435,11 @@ EntityReference Manager::preflight(
       [&result]([[maybe_unused]] std::size_t index, EntityReference preflightedRef) {
         result = std::move(preflightedRef);
       },
-      [&entityReference, &traitsHint](std::size_t index, errors::BatchElementError error) {
+      [&entityReference, &traitsHint, publishingAccess](std::size_t index,
+                                                        errors::BatchElementError error) {
         BatchElementExceptionData data;
         data.entityRef = entityReference;
+        data.access = static_cast<access::Access>(publishingAccess);
         data.traitsData = traitsHint;
         data.traitSet = traitsHint->traitSet();
         throwFromBatchElementError(index, std::move(error), std::move(data));
@@ -470,9 +477,11 @@ EntityReferences Manager::preflight(
       [&results](std::size_t index, EntityReference preflightedRef) {
         results[index] = std::move(preflightedRef);
       },
-      [&entityReferences, &traitsHints](std::size_t index, errors::BatchElementError error) {
+      [&entityReferences, &traitsHints, publishingAccess](std::size_t index,
+                                                          errors::BatchElementError error) {
         BatchElementExceptionData data;
         data.entityRef = entityReferences[index];
+        data.access = static_cast<access::Access>(publishingAccess);
         data.traitsData = traitsHints[index];
         data.traitSet = traitsHints[index]->traitSet();
         // Implemented as if FAILFAST is true.
@@ -529,9 +538,11 @@ EntityReference hostApi::Manager::register_(
       [&result]([[maybe_unused]] std::size_t index, EntityReference registeredRef) {
         result = std::move(registeredRef);
       },
-      [&entityReference, &entityTraitsData](std::size_t index, errors::BatchElementError error) {
+      [&entityReference, &entityTraitsData, publishingAccess](std::size_t index,
+                                                              errors::BatchElementError error) {
         BatchElementExceptionData data;
         data.entityRef = entityReference;
+        data.access = static_cast<access::Access>(publishingAccess);
         data.traitsData = entityTraitsData;
         data.traitSet = entityTraitsData->traitSet();
         throwFromBatchElementError(index, std::move(error), std::move(data));
@@ -571,9 +582,11 @@ std::vector<EntityReference> hostApi::Manager::register_(
       [&result](std::size_t index, EntityReference registeredRef) {
         result[index] = std::move(registeredRef);
       },
-      [&entityReferences, &entityTraitsDatas](std::size_t index, errors::BatchElementError error) {
+      [&entityReferences, &entityTraitsDatas, publishingAccess](std::size_t index,
+                                                                errors::BatchElementError error) {
         BatchElementExceptionData data;
         data.entityRef = entityReferences[index];
+        data.access = static_cast<access::Access>(publishingAccess);
         data.traitsData = entityTraitsDatas[index];
         data.traitSet = entityTraitsDatas[index]->traitSet();
         // Implemented as if FAILFAST is true

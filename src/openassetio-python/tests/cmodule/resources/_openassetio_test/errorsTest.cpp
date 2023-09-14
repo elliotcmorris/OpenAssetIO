@@ -29,6 +29,8 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
                                      : std::optional<openassetio::trait::TraitSet>{};
   const auto traitsData = traitSet ? openassetio::TraitsData::make(*traitSet)
                                    : std::optional<openassetio::TraitsDataPtr>{};
+  const auto access = populateArgs ? openassetio::access::Access::kWrite
+                                   : std::optional<openassetio::access::Access>{};
 
   if (exceptionName == "OpenAssetIOException") {
     throw openassetio::errors::OpenAssetIOException(kExceptionMessage);
@@ -71,7 +73,7 @@ void throwException(const std::string& exceptionName, bool populateArgs = true) 
   }
   if (exceptionName == "EntityAccessErrorBatchElementException") {
     throw openassetio::errors::EntityAccessErrorBatchElementException(
-        1, {ErrorCode::kEntityAccessError, kExceptionMessage}, entityRef);
+        1, {ErrorCode::kEntityAccessError, kExceptionMessage}, entityRef, access);
   }
   if (exceptionName == "InvalidEntityReferenceBatchElementException") {
     throw openassetio::errors::InvalidEntityReferenceBatchElementException(

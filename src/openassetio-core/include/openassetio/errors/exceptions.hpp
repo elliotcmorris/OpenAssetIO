@@ -9,6 +9,7 @@
 #include <openassetio/export.h>
 #include <openassetio/EntityReference.hpp>
 #include <openassetio/TraitsData.hpp>
+#include <openassetio/access.hpp>
 #include <openassetio/errors/BatchElementError.hpp>
 #include <openassetio/trait/collection.hpp>
 #include <openassetio/typedefs.hpp>
@@ -181,11 +182,16 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
  */
 struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
   EntityAccessErrorBatchElementException(std::size_t idx, BatchElementError err,
-                                         std::optional<EntityReference> causedByEntityReference);
+                                         std::optional<EntityReference> causedByEntityReference,
+                                         std::optional<access::Access> causedByAccess);
   /**
    * Entity that the error relates to, if available.
    */
   std::optional<EntityReference> entityReference;
+  /**
+   * Access mode that the error relates to, if available.
+   */
+  std::optional<access::Access> access;
 };
 
 /**
