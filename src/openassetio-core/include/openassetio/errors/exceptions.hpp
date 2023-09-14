@@ -182,7 +182,7 @@ struct OPENASSETIO_CORE_EXPORT EntityResolutionErrorBatchElementException
  */
 struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchElementException {
   EntityAccessErrorBatchElementException(std::size_t idx, BatchElementError err,
-                                         std::optional<EntityReference> causedByEntityReference,
+                                         std::optional<EntityReference> maybeEntityReference,
                                          std::optional<access::Access> causedByAccess);
   /**
    * Entity that the error relates to, if available.
@@ -204,7 +204,7 @@ struct OPENASSETIO_CORE_EXPORT EntityAccessErrorBatchElementException : BatchEle
  */
 struct OPENASSETIO_CORE_EXPORT InvalidTraitsDataBatchElementException : BatchElementException {
   InvalidTraitsDataBatchElementException(std::size_t idx, BatchElementError err,
-                                         std::optional<EntityReference> causedByEntityReference,
+                                         std::optional<EntityReference> maybeEntityReference,
                                          std::optional<TraitsDataPtr> causedByTraitsData);
   /**
    * Entity that the error relates to, if available.
@@ -231,7 +231,7 @@ struct OPENASSETIO_CORE_EXPORT InvalidPreflightHintBatchElementException
  */
 struct OPENASSETIO_CORE_EXPORT InvalidTraitSetBatchElementException : BatchElementException {
   InvalidTraitSetBatchElementException(std::size_t idx, BatchElementError err,
-                                       std::optional<EntityReference> causedByEntityReference,
+                                       std::optional<EntityReference> maybeEntityReference,
                                        std::optional<trait::TraitSet> causedByTraitSet);
 
   /**

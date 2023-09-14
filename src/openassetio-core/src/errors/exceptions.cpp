@@ -38,28 +38,28 @@ BatchElementEntityReferenceException::BatchElementEntityReferenceException(
       entityReference{std::move(causedByEntityReference)} {}
 
 EntityAccessErrorBatchElementException::EntityAccessErrorBatchElementException(
-    std::size_t idx, BatchElementError err, std::optional<EntityReference> causedByEntityReference,
+    std::size_t idx, BatchElementError err, std::optional<EntityReference> maybeEntityReference,
     std::optional<access::Access> causedByAccess)
-    : BatchElementException{constructEntityAccessErrorMessage(err.message, causedByEntityReference,
+    : BatchElementException{constructEntityAccessErrorMessage(err.message, maybeEntityReference,
                                                               causedByAccess),
                             idx, std::move(err)},
-      entityReference{std::move(causedByEntityReference)},
+      entityReference{std::move(maybeEntityReference)},
       access{causedByAccess} {}
 
 InvalidTraitsDataBatchElementException::InvalidTraitsDataBatchElementException(
-    std::size_t idx, BatchElementError err, std::optional<EntityReference> causedByEntityReference,
+    std::size_t idx, BatchElementError err, std::optional<EntityReference> maybeEntityReference,
     std::optional<TraitsDataPtr> causedByTraitsData)
-    : BatchElementException{constructEntityErrorMessage(err.message, causedByEntityReference), idx,
+    : BatchElementException{constructEntityErrorMessage(err.message, maybeEntityReference), idx,
                             std::move(err)},
-      entityReference{std::move(causedByEntityReference)},
+      entityReference{std::move(maybeEntityReference)},
       traitsData{std::move(causedByTraitsData)} {}
 
 InvalidTraitSetBatchElementException::InvalidTraitSetBatchElementException(
-    std::size_t idx, BatchElementError err, std::optional<EntityReference> causedByEntityReference,
+    std::size_t idx, BatchElementError err, std::optional<EntityReference> maybeEntityReference,
     std::optional<trait::TraitSet> causedByTraitSet)
-    : BatchElementException{constructEntityErrorMessage(err.message, causedByEntityReference), idx,
+    : BatchElementException{constructEntityErrorMessage(err.message, maybeEntityReference), idx,
                             std::move(err)},
-      entityReference{std::move(causedByEntityReference)},
+      entityReference{std::move(maybeEntityReference)},
       traitSet{std::move(causedByTraitSet)} {}
 
 }  // namespace errors
