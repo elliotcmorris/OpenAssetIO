@@ -23,6 +23,7 @@ target_sources(openassetio-core-cpp-test-exe
     ContextTest.cpp
     TraitsDataTest.cpp
     hostApi/ManagerTest.cpp
+    hostApi/ManagerBatchElementExceptionTest.cpp
     managerApi/HostTest.cpp
     managerApi/HostSessionTest.cpp
     managerApi/ManagerStateBaseTest.cpp
