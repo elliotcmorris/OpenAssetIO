@@ -158,6 +158,21 @@ class Test_exception_data:
 
         assert exc.value.entityReference == expected_entity_reference
 
+    def test_when_entity_access_batch_cpp_exception_thrown_then_access_is_retained(self):
+        exception_type = errors.EntityAccessErrorBatchElementException
+
+        with pytest.raises(exception_type) as exc:
+            _openassetio_test.throwExceptionWithUnpopulatedArgs(exception_type.__name__)
+
+        assert exc.value.entityReference is None
+        assert exc.value.access is None
+
+        with pytest.raises(exception_type) as exc:
+            _openassetio_test.throwExceptionWithPopulatedArgs(exception_type.__name__)
+
+        assert exc.value.entityReference == expected_entity_reference
+        assert exc.value.access == 1
+
     def test_when_trait_set_batch_cpp_exception_thrown_then_trait_set_is_retained(self):
         exception_type = errors.InvalidTraitSetBatchElementException
 

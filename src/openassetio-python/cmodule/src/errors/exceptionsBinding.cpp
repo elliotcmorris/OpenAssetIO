@@ -118,6 +118,12 @@ class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceExceptio
     def __init__(self, message, index, error, entityReference, traitsData):
         super().__init__(message, index, error, entityReference)
         self.traitsData = traitsData
+
+class EntityAccessErrorBatchElementException(BatchElementException):
+    def __init__(self, message, index, error, entityReference, access):
+        super().__init__(message, index, error)
+        self.entityReference = entityReference
+        self.access = access
 )pybind",
            mod.attr("__dict__"), mod.attr("__dict__"));
 
@@ -156,9 +162,6 @@ class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceExceptio
                       pyBatchElementEntityReferenceException);
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("MalformedEntityReferenceBatchElementException",
-                      pyBatchElementEntityReferenceException);
-  // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
-  registerPyException("EntityAccessErrorBatchElementException",
                       pyBatchElementEntityReferenceException);
   // NOLINTNEXTLINE(bugprone-throw-keyword-missing)
   registerPyException("EntityResolutionErrorBatchElementException",
@@ -201,7 +204,8 @@ class InvalidTraitsDataBatchElementException(BatchElementEntityReferenceExceptio
       setPyBatchException("MalformedEntityReferenceBatchElementException", exc,
                           exc.entityReference);
     } catch (const EntityAccessErrorBatchElementException &exc) {
-      setPyBatchException("EntityAccessErrorBatchElementException", exc, exc.entityReference);
+      setPyBatchException("EntityAccessErrorBatchElementException", exc, exc.entityReference,
+                          exc.access);
     } catch (const EntityResolutionErrorBatchElementException &exc) {
       setPyBatchException("EntityResolutionErrorBatchElementException", exc, exc.entityReference);
     } catch (const InvalidPreflightHintBatchElementException &exc) {
