@@ -203,3 +203,71 @@ jobs:
         env:
           CMAKE_PREFIX_PATH: ${{ github.workspace }}/dist
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/.conan/conan_paths.cmake
+
+  ayon-integration:
+    name: Ayon resolver on ${{ matrix.config.os }}
+    runs-on: ${{ matrix.config.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+        - os: windows-2019
+          site-packages: Lib/site-packages
+        - os: ubuntu-20.04
+          site-packages: lib/python3.9/site-packages
+        - os: macos-11
+          # MacOS toolchain doesn't search /usr/local by default:
+          # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
+          # The CMake FindPython module's Python::Python target (used in
+          # OpenAssetIO-Test-CMake) transitively adds linker flags to
+          # system libs, which fail due to this issue.
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          site-packages: lib/python3.9/site-packages
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Bootstrap
+        uses: ./.github/bootstrap_platform
+
+      - name: Build OpenAssetIO (setup.py)
+        run: |
+          ${{ matrix.config.preamble }}
+          python -m pip install src/openassetio-python
+        env:
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/.conan/conan_paths.cmake
+
+      - name: Checkout Ayon
+        uses: actions/checkout@v4
+        with:
+          repository: ynput/ayon-openassetio-manager-plugin
+          token: ${{ secrets.GITHUB_TOKEN }}
+          path: ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin
+
+      - name: Install and configure Poetry
+        run: |
+          cd ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin
+          mkdir -p ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin/.poetry
+          export POETRY_HOME="${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin/.poetry"
+          curl -sSL https://install.python-poetry.org/ | python -
+          "${POETRY_HOME}/bin/poetry" config virtualenvs.in-project true --local
+          "${POETRY_HOME}/bin/poetry" config virtualenvs.create true --local
+          "${POETRY_HOME}/bin/poetry" install --no-root $poetry_verbosity --ansi
+
+      - name: Run Ayon tests
+        run: |
+          cd ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin
+          .poetry/bin/poetry run pytest -v
+        env:
+          AYON_SERVER_URL: https://openassetio.ayon.dev
+          AYON_API_KEY: ${{ secrets.AYON_API_KEY }}
+          OPENASSETIO_PLUGIN_PATH: ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin/AyonOpenAssetIOManager
+          OPENASSETIO_DEFAULT_CONFIG: ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin/pyproject.toml
+
+
+
+
+
