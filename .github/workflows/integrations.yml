@@ -243,7 +243,7 @@ jobs:
       - name: Checkout Ayon
         uses: actions/checkout@v4
         with:
-          repository: ynput/ayon-openassetio-manager-plugin
+          repository: elliotcmorris/ayon-openassetio-manager-plugin
           token: ${{ secrets.GITHUB_TOKEN }}
           path: ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin
 
