@@ -257,14 +257,17 @@ jobs:
           "${POETRY_HOME}/bin/poetry" config virtualenvs.create true --local
           "${POETRY_HOME}/bin/poetry" install --no-root $poetry_verbosity --ansi
 
-      - name: Run Ayon tests
-        run: |
+      - name: Configure Ayon Site
+        run: >
           curl --header "x-ayon-site-id: oaio-tests"
           --header "x-ayon-platform: linux"
           --header "x-ayon-hostname: phobos"
           --header "x-api-key: ${{ secrets.AYON_API_KEY }}"
           --header "x-as-user: service"
           --header "x-ayon-version: 1.0.0-rc.2+DEVELOP" http://localhost:5000/api/info
+
+      - name: Run Ayon tests
+        run: |
           cd ${{ github.workspace }}/ynput/ayon-openassetio-manager-plugin
           .poetry/bin/poetry run pytest -v
         env:
