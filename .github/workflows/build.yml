@@ -27,25 +27,56 @@ jobs:
         # requires glibc 2.17, which is older than any of the available
         # environments.
         config:
+          # No Windows debug, Dosen't work on actions (easily)
+          # It's hard to get a python debug lib.
         - os: windows-2019
           preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
           shell: cmd
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: windows-2019
+          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+          shell: cmd
+          build-type: Release
+          run-on-prs: false
         - os: ubuntu-20.04
           shell: bash
-        - os: macos-11
+          build-type: Debug
+          run-on-prs: false
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: Release
+          run-on-prs: false
           # MacOS toolchain doesn't search /usr/local by default:
           # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
           # The CMake FindPython module's Python::Python target (used
           # via pybind11::embed in python-bridge-test) transitively adds
           # linker flags to system libs, which fail due to this issue.
+        - os: macos-11
           preamble: export LDFLAGS="-L/usr/local/lib"
           shell: bash
-        build-type: ["Debug", "Release", "RelWithDebInfo"]
+          build-type: Debug
+          run-on-prs: false
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: Release
+          run-on-prs: false
+
         # Dosen't work on actions, It's hard to get a python debug lib.
         exclude:
           - config:
               os: "windows-2019"
-          - build-type: "Debug"
+              build-type: "Debug"
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
@@ -60,32 +91,31 @@ jobs:
 
      # We don't want to publish the test build, it gets too big.
     - name: Build and Install (No tests)
-      if: |
-         github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
+      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       run: >
         ${{ matrix.config.preamble }}
 
         cmake -S . -B build -G Ninja
         --install-prefix ${{ github.workspace }}/dist
         --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
-        -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+        -DCMAKE_BUILD_TYPE=${{matrix.config.build-type}}
 
         cmake --build build
 
         cmake --install build
 
     - name: Upload archive
-      if: github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
+      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       uses: actions/upload-artifact@v4
       with:
-        name: openassetio-${{ runner.os}}-${{runner.arch}}-${{matrix.build-type}}
+        name: openassetio-${{ runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}
         path: |
           ${{ github.workspace }}/dist
 
     # Reconfigure to add the test target. Ctest should rebuild using
     # the cached build from prior.
     - name: Test
-      if: github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
+      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       run: >
         ${{ matrix.config.preamble }}
 
