@@ -41,6 +41,10 @@ jobs:
           preamble: export LDFLAGS="-L/usr/local/lib"
           shell: bash
         build-type: ["Debug", "Release", "RelWithDebInfo"]
+        # Dosen't work on actions, It's hard to get a python debug lib.
+        exclude:
+          - os: "windows-2019"
+          - build-type: "Debug"
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
@@ -55,7 +59,8 @@ jobs:
 
      # We don't want to publish the test build, it gets too big.
     - name: Build and Install (No tests)
-      if: github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
+      if: |
+         github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
       run: >
         ${{ matrix.config.preamble }}
 
