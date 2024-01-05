@@ -20,6 +20,7 @@ jobs:
           workflow: build.yml
           workflow_conclusion: success
           commit: ${{ github.sha }}
+          skip_unpack: true
           path: dist
 
       - name: Print dist directory
@@ -30,5 +31,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           for file in ${{ github.workspace }}/dist/openassetio*; do
-            gh release upload ${{ github.event.release.tag_name }} "$file"
+            if [ -f "$file" ]; then
+              gh release upload ${{ github.event.release.tag_name }} "$file"
+            fi
           done
