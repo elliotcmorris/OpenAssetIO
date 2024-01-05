@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write # release changes require contents write
     steps:
-      - name: Download wheels from commit ${{ github.sha }}
+      - name: Download artifacts from commit ${{ github.sha }}
         uses: dawidd6/action-download-artifact@v3
         with:
           workflow: build.yml
@@ -20,10 +20,13 @@ jobs:
           commit: ${{ github.sha }}
           path: dist
 
-      - run: ls -R dist
+      - name: Print dist directory
+        run: ls -R dist
 
-#      - name: Upload release builds
-#        env:
-#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-#        run:
-#          gh release upload ${GITHUB_REF#refs/tags/} ${{ github.workspace }}/dist/openassetio-${{ matrix.config.os }}.zip
+      - name: Upload release builds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          for file in ${{ github.workspace }}/dist/openassetio* do
+            gh release upload ${{ github.event.release.tag_name }} "$file"
+          done
