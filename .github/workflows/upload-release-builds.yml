@@ -12,13 +12,15 @@ jobs:
     permissions:
       contents: write # release changes require contents write
     steps:
-      - name: Download All Artifacts
-        uses: actions/download-artifact@v4
+      - name: Download wheels from commit ${{ github.sha }}
+        uses: dawidd6/action-download-artifact@v3
         with:
-          path: ${{ github.workspace }}/dist
-          pattern: openassetio-*
-          merge-multiple: true
-      - run: ls -R my-artifact
+          workflow: build.yml
+          workflow_conclusion: success
+          commit: ${{ github.sha }}
+          path: dist
+
+      - run: ls -R dist
 
 #      - name: Upload release builds
 #        env:
