@@ -62,7 +62,7 @@ jobs:
         cmake -S . -B build -G Ninja
         --install-prefix ${{ github.workspace }}/dist
         --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
-        -DCMAKE_BUILD_TYPE=RelWithDebInfo
+        -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
 
         cmake --build build
 
@@ -72,7 +72,7 @@ jobs:
       if: github.ref == 'refs/heads/main' || matrix.build-type == 'RelWithDebInfo'
       uses: actions/upload-artifact@v4
       with:
-        name: openassetio-${{ matrix.config.os }}
+        name: openassetio-${{ matrix.config.os }}-${{matrix.build-type}}
         path: |
           ${{ github.workspace }}/dist
 
