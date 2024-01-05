@@ -11,6 +11,9 @@ on:
   push:
     branches:
       - main
+    tags:
+      # Run if this is a release tag, to generate uploadable binaries.
+      - "v*.*.*"
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
