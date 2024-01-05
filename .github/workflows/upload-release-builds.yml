@@ -1,0 +1,27 @@
+name: Deploy_PyPI
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  upload-release-builds:
+    name: Upload release builds
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release changes require contents write
+    steps:
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: my-artifact
+          pattern: my-artifact-*
+          merge-multiple: true
+      - run: ls -R my-artifact
+
+#      - name: Upload release builds
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        run:
+#          gh release upload ${GITHUB_REF#refs/tags/} ${{ github.workspace }}/dist/openassetio-${{ matrix.config.os }}.zip

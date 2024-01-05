@@ -70,7 +70,7 @@ jobs:
         cmake --install build
 
     - name: Upload archive
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: openassetio-${{ matrix.config.os }}
         path: |
@@ -85,14 +85,6 @@ jobs:
         cmake --preset test build
 
         ctest -VV --test-dir build --parallel 2
-
-    - name: Publish
-      uses: softprops/action-gh-release@v1
-      #Only publish artifacts if this is a tag
-      if: startsWith(github.ref, 'refs/tags/')
-      with:
-        files: ${{ github.workspace }}/dist/openassetio-${{ matrix.config.os }}
-
 
   docs:
     runs-on: ubuntu-latest
