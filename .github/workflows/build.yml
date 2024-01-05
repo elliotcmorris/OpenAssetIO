@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }}
+    name: ${{ matrix.config.os }}-${{matrix.build-type}}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
