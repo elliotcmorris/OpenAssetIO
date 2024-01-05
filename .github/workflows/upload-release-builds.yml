@@ -1,4 +1,4 @@
-name: Deploy_PyPI
+name: Upload Release Builds
 
 on:
   release:
