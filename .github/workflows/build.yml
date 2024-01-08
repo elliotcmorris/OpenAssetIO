@@ -107,8 +107,8 @@ jobs:
     - name: Get compiler information
       id: compiler_info
       run: |
-        COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d '=' -f2)
-        COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d '=' -f2)
+        COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2)
+        COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2)
         echo "::set-output name=compiler_id::$COMPILER_ID"
         echo "::set-output name=compiler_version::$COMPILER_VERSION"
 
