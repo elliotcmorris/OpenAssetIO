@@ -107,13 +107,8 @@ jobs:
     - name: Get compiler information
       id: compiler_info
       run: |
-        # Extract compiler version
         COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d '=' -f2)
-
-        # Extract compiler ID
         COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d '=' -f2)
-
-        # Save to a github action
         echo "::set-output name=compiler_id::$COMPILER_ID"
         echo "::set-output name=compiler_version::$COMPILER_VERSION"
 
