@@ -104,11 +104,24 @@ jobs:
 
         cmake --install build
 
+    - name: Get compiler information
+      id: compiler_info
+      run: |
+        # Extract compiler version
+        COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d '=' -f2)
+
+        # Extract compiler ID
+        COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d '=' -f2)
+
+        # Save to a github action
+        echo "::set-output name=compiler_id::$COMPILER_ID"
+        echo "::set-output name=compiler_version::$COMPILER_VERSION"
+
     - name: Upload archive
       if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       uses: actions/upload-artifact@v4
       with:
-        name: openassetio-${{ runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}
+        name: openassetio-${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}
         path: |
           ${{ github.workspace }}/dist
 
