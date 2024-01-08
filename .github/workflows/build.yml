@@ -112,8 +112,8 @@ jobs:
       run: |
         COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
         COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
-        echo "::set-output name=compiler_id::$COMPILER_ID"
-        echo "::set-output name=compiler_version::$COMPILER_VERSION"
+        echo "compiler_id=$COMPILER_ID" >> $GITHUB_OUTPUT
+        echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
 
     - name: Upload archive
       if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
