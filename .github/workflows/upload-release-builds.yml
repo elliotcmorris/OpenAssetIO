@@ -34,8 +34,8 @@ jobs:
           for file in ${{ github.workspace }}/dist/openassetio*; do
             if [ -f "$file" ]; then
               FILE_NAME=$(basename "$file")
-              NEW_FILE_NAME="${FILE_NAME%.tar.gz}-${{ github.event.release.tag_name }}.tar.gz"
+              NEW_FILE_NAME="${FILE_NAME%.zip}-${{ github.event.release.tag_name }}.zip"
               mv "$file" "${file%$FILE_NAME}$NEW_FILE_NAME"
-              gh release upload ${{ github.event.release.tag_name }} "$file" --clobber
+              gh release upload ${{ github.event.release.tag_name }} "$NEW_FILE_NAME" --clobber
             fi
           done
