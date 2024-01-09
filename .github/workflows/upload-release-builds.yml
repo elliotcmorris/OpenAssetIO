@@ -33,7 +33,7 @@ jobs:
         run: |
           for file in ${{ github.workspace }}/dist/*; do
             if [ -f "$file" ]; then
-              FILE_NAME=$(basename "$file")
+              FILE_NAME=$(basename "$file" .zip)
               NEW_FILE_NAME="${FILE_NAME%}-OpenAssetIO${{ github.event.release.tag_name }}"
               NEW_FILE_PATH="${file%$FILE_NAME}$NEW_FILE_NAME"
               mv "$file" "$NEW_FILE_PATH"
