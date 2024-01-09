@@ -121,7 +121,7 @@ jobs:
       if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       uses: actions/upload-artifact@v4
       with:
-        name: openassetio-${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}-${{ steps.compiler_info.outputs.python_version }}
+        name: ${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}-${{ steps.compiler_info.outputs.python_version }}
         path: |
           ${{ github.workspace }}/dist
 
