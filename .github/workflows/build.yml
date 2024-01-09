@@ -99,7 +99,7 @@ jobs:
         fi
 
     - uses: actions/checkout@v4
-      if: steps.run_on_this_matrix.outputs.should_run
+      if: steps.run_on_this_matrix.outputs.should_run == true
 
     - name: Bootstrap
       uses: ./.github/bootstrap_platform
