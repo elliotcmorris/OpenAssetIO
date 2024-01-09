@@ -92,7 +92,7 @@ jobs:
       id: run_on_this_matrix
       if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       run:  |
-        if [[ "$GITHUB_REF" == "refs/heads/main" ]] || [[ "${{ matrix.config.run-on-prs }}" == "true" ]]; then
+        if [[ "${{github.ref}}" == "refs/heads/main" ]] || [[ "${{ matrix.config.run-on-prs }}" == "true" ]]; then
             echo "should_run=true" >> $GITHUB_ENV
         else
             echo "should_run=false" >> $GITHUB_ENV
