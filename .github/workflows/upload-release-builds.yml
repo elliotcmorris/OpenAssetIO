@@ -1,8 +1,7 @@
-name: Upload Release Builds
-
-
 # When a release occurs, download artifacts published from build.yml,
 # append the release tag to their names, and upload them to the release.
+
+name: Upload Release Builds
 
 on:
   release:
