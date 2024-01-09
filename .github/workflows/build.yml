@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }}-${{matrix.build-type}}
+    name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -84,6 +84,12 @@ jobs:
         shell: ${{ matrix.config.shell }}
 
     steps:
+    # It's very expensive to build our full release matrix when doing
+    # iteration on a branch, so only build a single type per platform.
+    - name: Exit early for redundant branch builds
+      if: github.ref != 'refs/heads/main' && matrix.config.run-on-prs == false
+      run: exit 0 # Exit with a status code of 0 to indicate success
+
     - uses: actions/checkout@v4
 
     - name: Bootstrap
