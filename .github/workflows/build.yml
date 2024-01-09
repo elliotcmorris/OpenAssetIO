@@ -90,7 +90,7 @@ jobs:
     # having a check in every step.
     - name: Should run
       id: run_on_this_matrix
-      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
+      shell: bash
       run:  |
         if [[ "${{github.ref}}" == "refs/heads/main" ]] || [[ "${{ matrix.config.run-on-prs }}" == "true" ]]; then
             echo "should_run=true" >> $GITHUB_ENV
