@@ -31,15 +31,15 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         # We want to append the release tag to the name before upload
         run: |
-          for file in ${{ github.workspace }}/dist/openassetio*; do
+          for file in ${{ github.workspace }}/dist/*; do
             if [ -f "$file" ]; then
               FILE_NAME=$(basename "$file")
-              NEW_FILE_NAME="${FILE_NAME%.zip}-OpenAssetIO${{ github.event.release.tag_name }}.zip"
+              NEW_FILE_NAME="${FILE_NAME%}-OpenAssetIO${{ github.event.release.tag_name }}"
               NEW_FILE_PATH="${file%$FILE_NAME}$NEW_FILE_NAME"
               mv "$file" "$NEW_FILE_PATH"
 
               echo $NEW_FILE_PATH
 
-              gh release upload ${{ github.event.release.tag_name }} $NEW_FILE_PATH --clobber
+              gh release upload ${{ github.event.release.tag_name }} "$NEW_FILE_PATH" --clobber
             fi
           done
