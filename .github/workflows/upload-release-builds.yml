@@ -38,10 +38,7 @@ jobs:
 
               NEW_FILE_NAME="${FILE_NAME_NO_EXTENSION%}-OpenAssetIO${{ github.event.release.tag_name }}"
               NEW_FILE_PATH="${file%$FILE_NAME}$NEW_FILE_NAME"
-              mv "$file" "$NEW_FILE_PATH"
-
-              echo $NEW_FILE_PATH
-
+              mv "$file" "$NEW_FILE_PATH".zip
               gh release upload ${{ github.event.release.tag_name }} "$NEW_FILE_PATH" --clobber
             fi
           done
