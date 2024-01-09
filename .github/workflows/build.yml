@@ -102,12 +102,12 @@ jobs:
       if: steps.run_on_this_matrix.outputs.should_run == true
 
     - name: Bootstrap
+      if: steps.run_on_this_matrix.outputs.should_run == true
       uses: ./.github/bootstrap_platform
-      if: steps.run_on_this_matrix.outputs.should_run
 
      # We don't want to publish the test build, it gets too big.
     - name: Build and Install (No tests)
-      if: steps.run_on_this_matrix.outputs.should_run
+      if: steps.run_on_this_matrix.outputs.should_run == true
       run: >
         ${{ matrix.config.preamble }}
 
@@ -121,7 +121,7 @@ jobs:
         cmake --install build
 
     - name: Get compiler information
-      if: steps.run_on_this_matrix.outputs.should_run
+      if: steps.run_on_this_matrix.outputs.should_run == true
       id: compiler_info
       shell: bash
       # Search the cmake info for the compiler information, remove the
@@ -135,7 +135,7 @@ jobs:
         echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
     - name: Upload archive
-      if: steps.run_on_this_matrix.outputs.should_run
+      if: steps.run_on_this_matrix.outputs.should_run == true
       uses: actions/upload-artifact@v4
       with:
         name: ${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}-${{ steps.compiler_info.outputs.python_version }}
@@ -145,7 +145,7 @@ jobs:
     # Reconfigure to add the test target. Ctest should rebuild using
     # the cached build from prior.
     - name: Test
-      if: steps.run_on_this_matrix.outputs.should_run
+      if: steps.run_on_this_matrix.outputs.should_run == true
       run: >
         ${{ matrix.config.preamble }}
 
