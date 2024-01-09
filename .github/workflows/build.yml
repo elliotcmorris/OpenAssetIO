@@ -112,7 +112,7 @@ jobs:
       run: |
         COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
         COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
-        PYTHON_VERSION= (python -V | sed 's/ /-/')
+        PYTHON_VERSION=$(python -V | sed 's/ /-/')
         echo "compiler_id=$COMPILER_ID" >> $GITHUB_OUTPUT
         echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
         echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
