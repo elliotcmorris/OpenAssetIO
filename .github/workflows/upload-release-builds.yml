@@ -1,0 +1,48 @@
+name: Upload Release Builds
+
+
+# When a release occurs, download artifacts published from build.yml,
+# append the release tag to their names, and upload them to the release.
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  upload-release-builds:
+    name: Upload release builds
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # release changes require contents write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download artifacts from commit ${{ github.sha }}
+        uses: dawidd6/action-download-artifact@v3
+        with:
+          workflow: build.yml
+          workflow_conclusion: success
+          commit: ${{ github.sha }}
+          skip_unpack: true
+          path: dist
+
+      - name: Print dist directory
+        run: ls -R dist
+
+      - name: Upload release builds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # We want to append the release tag to the name before upload
+        run: |
+          for file in ${{ github.workspace }}/dist/*; do
+            if [ -f "$file" ]; then
+              FILE_NAME=$(basename "$file")
+              FILE_NAME_NO_EXTENSION=$(basename "$file" .zip)
+
+              NEW_FILE_NAME="${FILE_NAME_NO_EXTENSION%}-OpenAssetIO${{ github.event.release.tag_name }}"
+              NEW_FILE_PATH="${file%$FILE_NAME}$NEW_FILE_NAME".zip
+              mv "$file" "$NEW_FILE_PATH"
+              gh release upload ${{ github.event.release.tag_name }} "$NEW_FILE_PATH" --clobber
+            fi
+          done
