@@ -147,13 +147,15 @@ To make a new OpenAssetIO release, follow this procedure.
 > Upon merging to main, several actions will kickoff against your merge
 > commit. Notably among these is
 > [Build wheels](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build-wheels.yml),
-> which makes the python release artifacts available for upload, by the
-> [Deploy PyPI](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/deploy-pypi.yml)
-> action.
+> which creates the python release artifacts, as well as
+> [Build and Test](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build.yml)
+> ,which behaves differently on main, building more variants than usual
+> for the purpose of release artifacts.
 >
 > The [Build wheels](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build-wheels.yml)
-> action must be successfully run before a release is created. Wait
-> until this action is finished before continuing on.
+> and [Build and Test](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build.yml)
+> actions must be successfully run before a release is created. Wait
+> until they are finished before continuing on.
 
 - Now the codebase is all set up, create a [new Release](https://github.com/OpenAssetIO/OpenAssetIO/releases/new)
   in GitHub.
@@ -168,10 +170,13 @@ To make a new OpenAssetIO release, follow this procedure.
   - If this is an alpha or beta release, ensure `Set as a pre-release`
     checkbox is checked.
   - Click "Publish Release"
-- In response to a release being published, the
-  [Deploy PyPI](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/deploy-pypi.yml)
-  action will be invoked. Monitor this to ensure PyPI wheels are
-  uploaded correctly.
+- In response to a release being published, two things happen.
+  - The [Deploy PyPI](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/deploy-pypi.yml)
+    action will be invoked. Monitor this to ensure PyPI wheels are
+    uploaded correctly.
+  - The [Upload Release Builds](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/upload-release-builds.yml)
+    action will be invoked, uploading the already built artifacts to
+    the release page.
 - You're done! Take a break and relax!
 
 ## Breaking integrations
