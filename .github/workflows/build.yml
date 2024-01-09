@@ -97,7 +97,6 @@ jobs:
 
      # We don't want to publish the test build, it gets too big.
     - name: Build and Install (No tests)
-      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       run: >
         ${{ matrix.config.preamble }}
 
@@ -124,7 +123,6 @@ jobs:
         echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
     - name: Upload archive
-      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       uses: actions/upload-artifact@v4
       with:
         name: ${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}-${{ steps.compiler_info.outputs.python_version }}
@@ -134,7 +132,6 @@ jobs:
     # Reconfigure to add the test target. Ctest should rebuild using
     # the cached build from prior.
     - name: Test
-      if: github.ref == 'refs/heads/main' || matrix.config.run-on-prs == true
       run: >
         ${{ matrix.config.preamble }}
 
