@@ -71,12 +71,6 @@ jobs:
           shell: bash
           build-type: Release
           run-on-prs: false
-
-        # Dosen't work on actions, It's hard to get a python debug lib.
-        exclude:
-          - config:
-              os: "windows-2019"
-              build-type: "Debug"
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
