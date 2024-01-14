@@ -99,6 +99,7 @@ jobs:
         # env var labels, and dequote it.
         run: |
           cd build
+
           compiler_version=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
           compiler_id=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
           python_version=$(python -V | sed 's/ /-/')
@@ -112,6 +113,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
+
           $env:archive_name="OpenAssetIO" + `
           "${{ github.event.release.tag_name }}" + `
           "-${{runner.os}}" + `
