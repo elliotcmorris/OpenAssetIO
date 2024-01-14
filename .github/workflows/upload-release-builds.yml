@@ -105,6 +105,7 @@ jobs:
           echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
       - name: Bundle Artifact
+        shell: bash
         run: |
           ARCHIVE_NAME=OpenAssetIO${{ github.event.release.tag_name }}-\
           ${{ runner.os }}-\
