@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-release-builds:
+  Build-release-builds:
     name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
     runs-on: ${{ matrix.config.os }}
     strategy:
@@ -113,6 +113,7 @@ jobs:
   upload-release-builds:
     name: "Upload release builds"
     runs-on: ubuntu-20.04
+    needs: Build-release-builds
     permissions:
       contents: write # release changes require contents write
     steps:
