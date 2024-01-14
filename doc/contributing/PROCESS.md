@@ -145,17 +145,15 @@ To make a new OpenAssetIO release, follow this procedure.
 > **Warning**
 >
 > Upon merging to main, several actions will kickoff against your merge
-> commit. Notably among these is
+> commit. Notable among these is
 > [Build wheels](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build-wheels.yml),
-> which creates the python release artifacts, as well as
-> [Build and Test](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build.yml)
-> ,which behaves differently on main, building more variants than usual
-> for the purpose of release artifacts.
+> which makes the python release artifacts available for upload, by the
+> [Deploy PyPI](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/deploy-pypi.yml)
+> action.
 >
 > The [Build wheels](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build-wheels.yml)
-> and [Build and Test](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/build.yml)
-> actions must be successfully run before a release is created. Wait
-> until they are finished before continuing on.
+> action must be successfully run before a release is created. Wait
+> until this action is finished before continuing on.
 
 - Now the codebase is all set up, create a [new Release](https://github.com/OpenAssetIO/OpenAssetIO/releases/new)
   in GitHub.
@@ -174,9 +172,9 @@ To make a new OpenAssetIO release, follow this procedure.
   - The [Deploy PyPI](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/deploy-pypi.yml)
     action will be invoked. Monitor this to ensure PyPI wheels are
     uploaded correctly.
-  - The [Upload Release Builds](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/upload-release-builds.yml)
-    action will be invoked, uploading the already built artifacts to
-    the release page.
+  - The [Upload release builds](https://github.com/OpenAssetIO/OpenAssetIO/actions/workflows/upload-release-builds.yml)
+    action will be invoked, building a wider than usual matrix of of
+    openassetio artifacts, and then uploading them to the release page.
 - You're done! Take a break and relax!
 
 ## Breaking integrations
