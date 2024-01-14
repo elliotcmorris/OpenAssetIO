@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   build:
-    name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
+    name: ${{ matrix.config.os }}
     runs-on: ${{ matrix.config.os }}
     strategy:
       fail-fast: false
@@ -27,50 +27,19 @@ jobs:
         # requires glibc 2.17, which is older than any of the available
         # environments.
         config:
-          # No Windows debug, Dosen't work on actions (easily)
-          # It's hard to get a python debug lib.
         - os: windows-2019
           preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
           shell: cmd
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: windows-2019
-          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
-          shell: cmd
-          build-type: Release
-          run-on-prs: false
         - os: ubuntu-20.04
           shell: bash
-          build-type: Debug
-          run-on-prs: false
-        - os: ubuntu-20.04
-          shell: bash
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: ubuntu-20.04
-          shell: bash
-          build-type: Release
-          run-on-prs: false
+        - os: macos-11
           # MacOS toolchain doesn't search /usr/local by default:
           # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
           # The CMake FindPython module's Python::Python target (used
           # via pybind11::embed in python-bridge-test) transitively adds
           # linker flags to system libs, which fail due to this issue.
-        - os: macos-11
           preamble: export LDFLAGS="-L/usr/local/lib"
           shell: bash
-          build-type: Debug
-          run-on-prs: false
-        - os: macos-11
-          preamble: export LDFLAGS="-L/usr/local/lib"
-          shell: bash
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: macos-11
-          preamble: export LDFLAGS="-L/usr/local/lib"
-          shell: bash
-          build-type: Release
-          run-on-prs: false
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
@@ -78,68 +47,35 @@ jobs:
         shell: ${{ matrix.config.shell }}
 
     steps:
-    # It's very expensive to build our full release matrix when doing
-    # iteration on a branch, so only build a single type per platform.
-    # The cleanest way to do this over a build matrix seems to be
-    # having a check in every step.
-    - name: Should run
-      id: run_on_this_matrix
-      shell: bash
-      run:  |
-        if [[ "${{github.ref}}" == "refs/heads/main" ]] || [[ "${{ matrix.config.run-on-prs }}" == "true" ]]; then
-            echo "should_run=true" >> $GITHUB_OUTPUT
-        else
-            echo "should_run=false" >> $GITHUB_OUTPUT
-        fi
-
     - uses: actions/checkout@v4
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
 
     - name: Bootstrap
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
       uses: ./.github/bootstrap_platform
 
      # We don't want to publish the test build, it gets too big.
     - name: Build and Install (No tests)
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
       run: >
         ${{ matrix.config.preamble }}
 
         cmake -S . -B build -G Ninja
         --install-prefix ${{ github.workspace }}/dist
         --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
-        -DCMAKE_BUILD_TYPE=${{matrix.config.build-type}}
+        -DCMAKE_BUILD_TYPE=RelWithDebInfo
 
         cmake --build build
 
         cmake --install build
 
-    - name: Get compiler information
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
-      id: compiler_info
-      shell: bash
-      # Search the cmake info for the compiler information, remove the
-      # env var labels, and dequote it.
-      run: |
-        COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
-        COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
-        PYTHON_VERSION=$(python -V | sed 's/ /-/')
-        echo "compiler_id=$COMPILER_ID" >> $GITHUB_OUTPUT
-        echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
-        echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
-
     - name: Upload archive
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v3
       with:
-        name: ${{runner.os}}-${{runner.arch}}-${{matrix.config.build-type}}-${{ steps.compiler_info.outputs.compiler_id }}-${{ steps.compiler_info.outputs.compiler_version }}-${{ steps.compiler_info.outputs.python_version }}
+        name: openassetio-${{ matrix.config.os }}
         path: |
           ${{ github.workspace }}/dist
 
     # Reconfigure to add the test target. Ctest should rebuild using
     # the cached build from prior.
     - name: Test
-      if: steps.run_on_this_matrix.outputs.should_run == 'true'
       run: >
         ${{ matrix.config.preamble }}
 
