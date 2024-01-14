@@ -1,5 +1,6 @@
-# When a release occurs, download artifacts published from build.yml,
-# append the release tag to their names, and upload them to the release.
+# When a release occurs, do a full matrix build (duplicated logic from
+# build.yml), name the artifacts appropriately, and upload them to
+# the release.
 
 name: Upload Release Builds
 
@@ -9,39 +10,115 @@ on:
   workflow_dispatch:
 
 jobs:
-  upload-release-builds:
-    name: Upload release builds
-    runs-on: ubuntu-latest
+  Build-and-upload-release-builds:
+    name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
+    runs-on: ${{ matrix.config.os }}
     permissions:
       contents: write # release changes require contents write
+    strategy:
+      fail-fast: false
+      matrix:
+        # We can't properly align to the VFX Reference Platform as this
+        # requires glibc 2.17, which is older than any of the available
+        # environments.
+        config:
+          # No Windows debug, Dosen't work on actions (easily)
+          # It's hard to get a python debug lib.
+        - os: windows-2019
+          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+          shell: cmd
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: windows-2019
+          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+          shell: cmd
+          build-type: Release
+          run-on-prs: false
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: Debug
+          run-on-prs: false
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: Release
+          run-on-prs: false
+          # MacOS toolchain doesn't search /usr/local by default:
+          # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
+          # The CMake FindPython module's Python::Python target (used
+          # via pybind11::embed in python-bridge-test) transitively adds
+          # linker flags to system libs, which fail due to this issue.
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: Debug
+          run-on-prs: false
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: RelWithDebInfo
+          run-on-prs: true
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: Release
+          run-on-prs: false
+    defaults:
+      run:
+        # Annoyingly required here since `matrix` isn't available in
+        # the `shell` property of individual steps.
+        shell: ${{ matrix.config.shell }}
+
     steps:
       - uses: actions/checkout@v4
 
-      - name: Download artifacts from commit ${{ github.sha }}
-        uses: dawidd6/action-download-artifact@v3
-        with:
-          workflow: build.yml
-          workflow_conclusion: success
-          commit: ${{ github.sha }}
-          skip_unpack: true
-          path: dist
+      - name: Bootstrap
+        uses: ./.github/bootstrap_platform
 
-      - name: Print dist directory
-        run: ls -R dist
+      # We don't want to publish the test build, it gets too big.
+      - name: Build and Install (No tests)
+        run: >
+          ${{ matrix.config.preamble }}
 
-      - name: Upload release builds
+          cmake -S . -B build -G Ninja
+          --install-prefix ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}
+          --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
+          -DCMAKE_BUILD_TYPE=${{matrix.config.build-type}}
+
+          cmake --build build
+
+          cmake --install build
+
+      - name: Get compiler information
+        id: compiler_info
+        shell: bash
+        # Search the cmake info for the compiler information, remove the
+        # env var labels, and dequote it.
+        run: |
+          cd build
+          COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
+          COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
+          PYTHON_VERSION=$(python -V | sed 's/ /-/')
+          echo "compiler_id=$COMPILER_ID" >> $GITHUB_OUTPUT
+          echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
+          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+
+      - name: Bundle and Upload Artifact
+        #Use inbuilt powershell commands because `zip` isn't on windows.
+        shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # We want to append the release tag to the name before upload
         run: |
-          for file in ${{ github.workspace }}/dist/*; do
-            if [ -f "$file" ]; then
-              FILE_NAME=$(basename "$file")
-              FILE_NAME_NO_EXTENSION=$(basename "$file" .zip)
-
-              NEW_FILE_NAME="${FILE_NAME_NO_EXTENSION%}-OpenAssetIO${{ github.event.release.tag_name }}"
-              NEW_FILE_PATH="${file%$FILE_NAME}$NEW_FILE_NAME".zip
-              mv "$file" "$NEW_FILE_PATH"
-              gh release upload ${{ github.event.release.tag_name }} "$NEW_FILE_PATH" --clobber
-            fi
-          done
+          $env:ARCHIVE_NAME="OpenAssetIO" + `
+          "${{ github.event.release.tag_name }}" + `
+          "-${{runner.os}}" + `
+          "-${{runner.arch}}" + `
+          "-${{matrix.config.build-type}}" + `
+          "-${{ steps.compiler_info.outputs.compiler_id }}" + `
+          "-${{ steps.compiler_info.outputs.compiler_version }}" + `
+          "-${{ steps.compiler_info.outputs.python_version }}.zip"
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:ARCHIVE_NAME
+          gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:ARCHIVE_NAME --clobber
