@@ -64,6 +64,12 @@ jobs:
           shell: bash
           build-type: Release
           run-on-prs: false
+    defaults:
+      run:
+        # Annoyingly required here since `matrix` isn't available in
+        # the `shell` property of individual steps.
+        shell: ${{ matrix.config.shell }}
+
     steps:
       - uses: actions/checkout@v4
 
