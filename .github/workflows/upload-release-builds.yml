@@ -99,12 +99,13 @@ jobs:
         # env var labels, and dequote it.
         run: |
           cd build
-          COMPILER_VERSION=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
-          COMPILER_ID=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
-          PYTHON_VERSION=$(python -V | sed 's/ /-/')
-          echo "compiler_id=$COMPILER_ID" >> $GITHUB_OUTPUT
-          echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
-          echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
+
+          compiler_version=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
+          compiler_id=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
+          python_version=$(python -V | sed 's/ /-/')
+          echo "compiler_version=$compiler_version" >> $GITHUB_OUTPUT
+          echo "compiler_id=$compiler_id" >> $GITHUB_OUTPUT
+          echo "python_version=$python_version" >> $GITHUB_OUTPUT
 
       - name: Bundle and Upload Artifact
         #Use inbuilt powershell commands because `zip` isn't on windows.
@@ -112,7 +113,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $env:ARCHIVE_NAME="OpenAssetIO" + `
+
+          $env:archive_name="OpenAssetIO" + `
           "${{ github.event.release.tag_name }}" + `
           "-${{runner.os}}" + `
           "-${{runner.arch}}" + `
@@ -120,5 +122,5 @@ jobs:
           "-${{ steps.compiler_info.outputs.compiler_id }}" + `
           "-${{ steps.compiler_info.outputs.compiler_version }}" + `
           "-${{ steps.compiler_info.outputs.python_version }}.zip"
-          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:ARCHIVE_NAME
-          gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:ARCHIVE_NAME --clobber
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:archive_name
+          gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:archive_name --clobber
