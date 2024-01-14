@@ -107,7 +107,7 @@ jobs:
           echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
       - name: Bundle and Upload Artifact
-        #Use inbuild powershell commands because `zip` isn't on windows.
+        #Use inbuilt powershell commands because `zip` isn't on windows.
         shell: pwsh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
