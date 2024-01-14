@@ -105,17 +105,18 @@ jobs:
           echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
       - name: Bundle Artifact
-        shell: bash
+        #Use inbuild powershell commands because `zip` isn't on windows.
+        shell: pwsh
         run: |
-          ARCHIVE_NAME=OpenAssetIO${{ github.event.release.tag_name }}-\
-          ${{ runner.os }}-\
-          ${{ runner.arch }}-\
-          ${{ matrix.config.build-type }}-\
-          ${{ steps.compiler_info.outputs.compiler_id }}-\
-          ${{ steps.compiler_info.outputs.compiler_version }}-\
-          ${{ steps.compiler_info.outputs.python_version }}
-          echo $ARCHIVE_NAME
-          zip -r ARCHIVE_NAME.zip ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}
+          $env:ARCHIVE_NAME="OpenAssetIO" + `
+          "${{ github.event.release.tag_name }}" + `
+          "-${{runner.os}}" + `
+          "-${{runner.arch}}" + `
+          "-${{matrix.config.build-type}}" + `
+          "-${{ steps.compiler_info.outputs.compiler_id }}" + `
+          "-${{ steps.compiler_info.outputs.compiler_version }}" + `
+          "-${{ steps.compiler_info.outputs.python_version }}"
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath "$env:ARCHIVE_NAME.zip"
 
   upload-release-builds:
     name: "Upload release builds"
