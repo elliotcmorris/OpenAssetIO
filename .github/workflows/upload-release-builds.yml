@@ -10,9 +10,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build-release-builds:
+  Build-and-upload-release-builds:
     name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
     runs-on: ${{ matrix.config.os }}
+    permissions:
+      contents: write # release changes require contents write
     strategy:
       fail-fast: false
       matrix:
@@ -104,9 +106,11 @@ jobs:
           echo "compiler_version=$COMPILER_VERSION" >> $GITHUB_OUTPUT
           echo "python_version=$PYTHON_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Bundle Artifact
+      - name: Bundle and Upload Artifact
         #Use inbuild powershell commands because `zip` isn't on windows.
         shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $env:ARCHIVE_NAME="OpenAssetIO" + `
           "${{ github.event.release.tag_name }}" + `
@@ -115,24 +119,6 @@ jobs:
           "-${{matrix.config.build-type}}" + `
           "-${{ steps.compiler_info.outputs.compiler_id }}" + `
           "-${{ steps.compiler_info.outputs.compiler_version }}" + `
-          "-${{ steps.compiler_info.outputs.python_version }}"
-          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath "$env:ARCHIVE_NAME.zip"
-
-  upload-release-builds:
-    name: "Upload release builds"
-    runs-on: ubuntu-20.04
-    needs: Build-release-builds
-    permissions:
-      contents: write # release changes require contents write
-    steps:
-
-      - name: Upload release builds
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          for file in ${{ github.workspace }}/dist/*; do
-            echo $file
-            if [ -f "$file" ]; then
-              gh release upload ${{ github.event.release.tag_name }} "$file" --clobber
-            fi
-          done
+          "-${{ steps.compiler_info.outputs.python_version }}.zip"
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:ARCHIVE_NAME
+          gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:ARCHIVE_NAME --clobber
