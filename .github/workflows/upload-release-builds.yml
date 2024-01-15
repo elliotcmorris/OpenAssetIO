@@ -84,7 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $env:archive_name="OpenAssetIO" + `
+          $env:archive_name="OpenAssetIO-" + `
           "${{ github.event.release.tag_name }}" + `
           "-${{runner.os}}" + `
           "-${{runner.arch}}" + `
