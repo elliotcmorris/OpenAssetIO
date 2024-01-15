@@ -11,7 +11,7 @@ on:
 
 jobs:
   Build-and-upload-release-builds:
-    name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
+    name: ${{ matrix.config.os }}-${{matrix.build-type}}
     runs-on: ${{ matrix.config.os }}
     permissions:
       contents: write # release changes require contents write
@@ -27,25 +27,8 @@ jobs:
         - os: windows-2019
           preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
           shell: cmd
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: windows-2019
-          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
-          shell: cmd
-          build-type: Release
-          run-on-prs: false
         - os: ubuntu-20.04
           shell: bash
-          build-type: Debug
-          run-on-prs: false
-        - os: ubuntu-20.04
-          shell: bash
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: ubuntu-20.04
-          shell: bash
-          build-type: Release
-          run-on-prs: false
           # MacOS toolchain doesn't search /usr/local by default:
           # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
           # The CMake FindPython module's Python::Python target (used
@@ -54,18 +37,7 @@ jobs:
         - os: macos-11
           preamble: export LDFLAGS="-L/usr/local/lib"
           shell: bash
-          build-type: Debug
-          run-on-prs: false
-        - os: macos-11
-          preamble: export LDFLAGS="-L/usr/local/lib"
-          shell: bash
-          build-type: RelWithDebInfo
-          run-on-prs: true
-        - os: macos-11
-          preamble: export LDFLAGS="-L/usr/local/lib"
-          shell: bash
-          build-type: Release
-          run-on-prs: false
+        build-type: ["Debug", "RelWithDebInfo", "Release"]
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
@@ -84,9 +56,9 @@ jobs:
           ${{ matrix.config.preamble }}
 
           cmake -S . -B build -G Ninja
-          --install-prefix ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}
+          --install-prefix ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.build-type }}
           --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
-          -DCMAKE_BUILD_TYPE=${{matrix.config.build-type}}
+          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
 
           cmake --build build
 
@@ -99,7 +71,6 @@ jobs:
         # env var labels, and dequote it.
         run: |
           cd build
-
           compiler_version=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_VERSION " | cut -d ' ' -f2 | tr -d '"')
           compiler_id=$(cmake --system-information | grep -E "^CMAKE_CXX_COMPILER_ID " | cut -d ' ' -f2 | tr -d '"')
           python_version=$(python -V | sed 's/ /-/')
@@ -113,8 +84,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-
-          $env:archive_name="OpenAssetIO" + `
+          $env:archive_name="OpenAssetIO-" + `
           "${{ github.event.release.tag_name }}" + `
           "-${{runner.os}}" + `
           "-${{runner.arch}}" + `
@@ -122,5 +92,5 @@ jobs:
           "-${{ steps.compiler_info.outputs.compiler_id }}" + `
           "-${{ steps.compiler_info.outputs.compiler_version }}" + `
           "-${{ steps.compiler_info.outputs.python_version }}.zip"
-          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:archive_name
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:archive_name
           gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:archive_name --clobber
