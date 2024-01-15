@@ -11,7 +11,7 @@ on:
 
 jobs:
   Build-and-upload-release-builds:
-    name: ${{ matrix.config.os }}-${{matrix.build-type}}
+    name: ${{ matrix.config.os }}-${{matrix.config.build-type}}
     runs-on: ${{ matrix.config.os }}
     permissions:
       contents: write # release changes require contents write
@@ -27,8 +27,20 @@ jobs:
         - os: windows-2019
           preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
           shell: cmd
+          build-type: RelWithDebInfo
+        - os: windows-2019
+          preamble: call "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Enterprise\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+          shell: cmd
+          build-type: Release
         - os: ubuntu-20.04
           shell: bash
+          build-type: Debug
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: RelWithDebInfo
+        - os: ubuntu-20.04
+          shell: bash
+          build-type: Release
           # MacOS toolchain doesn't search /usr/local by default:
           # https://gitlab.kitware.com/cmake/cmake/-/issues/19120
           # The CMake FindPython module's Python::Python target (used
@@ -37,7 +49,15 @@ jobs:
         - os: macos-11
           preamble: export LDFLAGS="-L/usr/local/lib"
           shell: bash
-        build-type: ["Debug", "RelWithDebInfo", "Release"]
+          build-type: Debug
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: RelWithDebInfo
+        - os: macos-11
+          preamble: export LDFLAGS="-L/usr/local/lib"
+          shell: bash
+          build-type: Release
     defaults:
       run:
         # Annoyingly required here since `matrix` isn't available in
@@ -56,9 +76,9 @@ jobs:
           ${{ matrix.config.preamble }}
 
           cmake -S . -B build -G Ninja
-          --install-prefix ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.build-type }}
+          --install-prefix ${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}
           --toolchain ${{ github.workspace }}/.conan/conan_paths.cmake
-          -DCMAKE_BUILD_TYPE=${{matrix.build-type}}
+          -DCMAKE_BUILD_TYPE=${{matrix.config.build-type}}
 
           cmake --build build
 
@@ -92,5 +112,5 @@ jobs:
           "-${{ steps.compiler_info.outputs.compiler_id }}" + `
           "-${{ steps.compiler_info.outputs.compiler_version }}" + `
           "-${{ steps.compiler_info.outputs.python_version }}.zip"
-          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:archive_name
+          Compress-Archive -Path "${{ github.workspace }}/dist/${{ matrix.config.os }}${{ matrix.config.build-type }}" -DestinationPath ${{ github.workspace }}/dist/$env:archive_name
           gh release upload ${{ github.event.release.tag_name }} ${{ github.workspace }}/dist/$env:archive_name --clobber
