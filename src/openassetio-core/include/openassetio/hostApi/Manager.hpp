@@ -1481,6 +1481,35 @@ class OPENASSETIO_CORE_EXPORT Manager final {
                            const BatchElementErrorCallback& errorCallback,
                            const trait::TraitSet& resultTraitSet = {});
 
+  // Singular except
+  EntityReferencePagerPtr getWithRelationship(
+      const EntityReference& entityReference, const trait::TraitsDataPtr& relationshipTraitsData,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Exception& errorPolicyTag = {});
+
+  // Singular variant
+  std::variant<errors::BatchElementError, EntityReferencePagerPtr> getWithRelationship(
+      const EntityReference& entityReference, const trait::TraitsDataPtr& relationshipTraitsData,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
+
+  // Multi except
+  std::vector<EntityReferencePagerPtr> getWithRelationship(
+      const EntityReferences& entityReferences, const trait::TraitsDataPtr& relationshipTraitsData,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Exception& errorPolicyTag = {});
+
+  // Multi variant
+  std::vector<std::variant<errors::BatchElementError, EntityReferencePagerPtr>>
+  getWithRelationship(const EntityReferences& entityReferences,
+                      const trait::TraitsDataPtr& relationshipTraitsData, size_t pageSize,
+                      access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+                      const trait::TraitSet& resultTraitSet,
+                      const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
+
   /**
    * Queries entity references that are related to the input reference
    * by the relationships defined by a set of traits and their
@@ -1552,6 +1581,36 @@ class OPENASSETIO_CORE_EXPORT Manager final {
                             const RelationshipQuerySuccessCallback& successCallback,
                             const BatchElementErrorCallback& errorCallback,
                             const trait::TraitSet& resultTraitSet = {});
+
+  // Singular except
+  EntityReferencePagerPtr getWithRelationships(
+      const EntityReference& entityReference, const trait::TraitsDataPtr& relationshipTraitsData,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Exception& errorPolicyTag = {});
+
+  // Singular variant
+  std::variant<errors::BatchElementError, EntityReferencePagerPtr> getWithRelationships(
+      const EntityReference& entityReference, const trait::TraitsDataPtr& relationshipTraitsData,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
+
+  // Multi except
+  std::vector<EntityReferencePagerPtr> getWithRelationships(
+      const EntityReference& entityReference, const trait::TraitsDatas& relationshipTraitsDatas,
+      size_t pageSize, access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+      const trait::TraitSet& resultTraitSet,
+      const BatchElementErrorPolicyTag::Exception& errorPolicyTag = {});
+
+  // Multi variant
+  std::vector<std::variant<errors::BatchElementError, EntityReferencePagerPtr>>
+  getWithRelationships(const EntityReference& entityReference,
+                       const trait::TraitsDatas& relationshipTraitsDatas, size_t pageSize,
+                       access::RelationsAccess relationsAccess, const ContextConstPtr& context,
+                       const trait::TraitSet& resultTraitSet,
+                       const BatchElementErrorPolicyTag::Variant& errorPolicyTag);
+
   /// @}
 
   /**
