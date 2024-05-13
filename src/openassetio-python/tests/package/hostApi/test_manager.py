@@ -975,6 +975,12 @@ class FakeEntityReferencePagerInterface(EntityReferencePagerInterface):
         pass
 
 
+# The getWithRelationship tests are more repetitive than most tests
+# in this suite. They are unable to make use of the test
+# automation that we have written for the conveniences signatures, as
+# the arguments for getWithRelationship are not in the standard format.
+
+
 class Test_Manager_getWithRelationship_with_callback_signiature:
     def test_wraps_the_corresponding_method_of_the_held_interface(
         self,
