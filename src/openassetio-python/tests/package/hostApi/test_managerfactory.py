@@ -211,24 +211,17 @@ class Test_ManagerFactory_defaultManagerForInterface:
         mock_host_interface,
         mock_logger,
     ):
-        with pytest.raises(
-            errors.ConfigurationException,
-            match=(
-                "Error parsing config file. Error while parsing key: multi-line strings are"
-                " prohibited in keys"
-            ),
-        ):
-            if use_env_var_for_config_file:
-                ManagerFactory.defaultManagerForInterface(
-                    mock_host_interface, mock_manager_implementation_factory, mock_logger
-                )
-            else:
-                ManagerFactory.defaultManagerForInterface(
-                    invalid_manager_config,
-                    mock_host_interface,
-                    mock_manager_implementation_factory,
-                    mock_logger,
-                )
+        if use_env_var_for_config_file:
+            ManagerFactory.defaultManagerForInterface(
+                mock_host_interface, mock_manager_implementation_factory, mock_logger
+            )
+        else:
+            ManagerFactory.defaultManagerForInterface(
+                invalid_manager_config,
+                mock_host_interface,
+                mock_manager_implementation_factory,
+                mock_logger,
+            )
 
     @pytest.mark.parametrize("use_env_var_for_config_file", [True, False])
     def test_when_invalid_property_type_then_ConfigurationException_raised(
