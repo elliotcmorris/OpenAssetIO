@@ -62,3 +62,5 @@ class OpenAssetIOConan(ConanFile):
         # Enable optimising patterns with additional compile step.
         self.options["pcre2"].support_jit = True
 
+        self.options["tomlplusplus"].exceptions = True
+
